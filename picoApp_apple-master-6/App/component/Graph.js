@@ -1,0 +1,965 @@
+import React, { useState, useEffect, useContext } from 'react';
+import { View, StyleSheet, ActivityIndicator, Shape } from 'react-native';
+import { DeviceContext, PicoContext, UserContext } from '../context';
+import { LineChart, Grid, XAxis, BarChart, AreaChart, Path } from 'react-native-svg-charts';
+import { Circle, G, Rect, Text, ClipPath, Line, Defs, Svg } from 'react-native-svg';
+import colors from '../src/colors';
+import Tooltip from './Tooltip';
+import { color } from 'react-native-reanimated';
+
+export const Graph = (props) => {
+  let tempArray = [];
+  let TimeArray = [
+    "06:00", "06:15", "06:30", "06:45", "07:00", "07:15", "07:30", "07:45", "08:00", "08:15", "08:30", "08:45", "09:00", "09:15", "09:30", "09:45",
+    "10:00", "10:15", "10:30", "10:45", "11:00", "11:15", "11:30", "11:45", "12:00", "12:15", "12:30", "12:45", "13:00", "13:15", "13:30", "13:45",
+    "14:00", "14:15", "14:30", "14:45", "15:00", "15:15", "15:30", "15:45", "16:00", "16:15", "16:30", "16:45", "17:00", "17:15", "17:30", "17:45",
+    "18:00", "18:15", "18:30", "18:45", "19:00", "19:15", "19:30", "19:45", "20:00", "20:15", "20:30", "20:45", "21:00", "21:15", "21:30", "21:45",
+    "22:00", "22:15", "22:30", "22:45", "23:00", "23:15", "23:30", "23:45", "00:00", "00:15", "00:30", "00:45", "01:00", "01:15", "01:30", "01:45",
+    "02:00", "02:15", "02:30", "02:45", "03:00", "03:15", "03:30", "03:45", "04:00", "04:15", "04:30", "04:45", "05:00", "05:15", "05:30", "05:45",
+    "val"
+  ];
+  let min=10000;
+  let max=0;
+  let cnt=0;
+  let tempArrayTime = [];
+  let finalArray = [];
+  const date = new Date();
+  const userInfo = useContext(UserContext);
+  const device = useContext(DeviceContext);
+  const id = useContext(PicoContext);
+  // 그래프에 섭씨 화씨 변경 적용하지 말자.
+  // const tempMod = useContext(TempContext);
+
+  const xAxisDataNum = [0, 3, 6, 9, 12, 15, 18, 21, 24];
+  const axesSvg = { fontSize: 10, fill: 'grey' };
+  const verticalContentInset = { top: 10, bottom: 10 };
+
+  const xAxisHeight = 50;
+  const air = [props.state];
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [tooltipX, setToolTipX] = useState(0);
+  const [tooltipY, setToolTipY] = useState(0);
+  const [tooltipIndex, setToolTipIndex] = useState(0);
+  const [tooltipColor, setToolTipColor] = useState(0);
+
+  const [deviceAirInfo, setDeviceAirInfo] = useState(0);
+  const [stateArray, setStateArray] = useState([]);
+  const [minValue, setMinValue] = useState(0);
+  const [maxValue, setMaxValue] = useState(0);
+  /*
+    let max =-1000
+    let min = 1000
+    for(let i = 0; i < data.length; i++){
+        if(max < data[i])
+        {
+            max = data[i]
+        }
+        if(min > data[i])
+        {
+            min =data[i]
+        }
+    }
+    if(min<0)
+    {
+        min = min *(-1)
+    }
+    const totalLength=(max+min)
+    const heightGrap = 200
+    const indexToClipFrom = 10
+    const limitLineValue = 28
+    let upperColorLimitValueInNumber = ((heightGrap/totalLength)*(max-limitLineValue))/2
+    let upperColorLimit = upperColorLimitValueInNumber.toString()+"%"
+  
+  const Clips = ({ x, y, width }) => (
+    <Defs key={'clips'}>
+      <ClipPath id="clip-path-1">
+        <Rect x={'0'} y={'0'} width={width} height={'100%'} />
+      </ClipPath>
+      <ClipPath id={'clip-path-2'}>
+        <Rect x={x(0)} y={'0'} width={width} height={'100%'} />
+      </ClipPath>
+    </Defs>
+  )
+
+  const HorizontalLine = (({ y }) => (
+    <Line
+      //key={ 'zero-axis' }
+      x1={'0%'}
+      x2={'100%'}
+      y1={y(16)}
+      y2={y(16)}
+      stroke={'grey'}
+      strokeDasharray={[4, 8]}
+      strokeWidth={2}
+    />
+  ))
+
+
+  // Line extras:
+  const DashedLine = ({ line }) => (
+    <Path
+      key={'line-1'}
+      d={line}
+      stroke={'red'}
+      strokeWidth={1}
+      fill={'none'}
+      //strokeDasharray={ [ 5, 0 ] }
+      clipPath={'url(#clip-path-2)'}
+    />
+  )
+
+  const Shadow = ({ line }) => (
+    <Path
+      y={3}
+      key={'shadow-1'}
+      d={line}
+      stroke={'rgba(134, 65, 244, 0.2)'}
+      strokeWidth={5}
+      fill={'none'}
+    />
+  )
+  */
+
+
+  const CustomLines = ({ x, y, data }) => {
+
+    return data.map((value, index, array) => {
+
+      if (index + 1 < array.length-1 ) {
+        if (array[index] && array[index + 1]) {
+          return (
+            <Line
+              key={index}
+              stroke={'#E7E7E7'}
+              strokeWidth={2}
+            
+              x1={x(index)}
+              x2={x(index + 1)}
+              y1={y(array[index])}
+              y2={y(array[index + 1])}
+            />
+          )
+
+
+        } else {
+          if ((array[index] == 0) && (0 < index)) {
+            if (array[index - 1] && array[index + 1]) {
+              return (
+                <Line
+                  key={index}
+                  stroke={'#E7E7E7'}
+                  strokeWidth={2}
+                  x1={x(index-1)}
+                  x2={x(index + 1)}
+                  y1={y(array[index-1])}
+                  y2={y(array[index + 1])}
+                />
+              )
+            }
+          } 
+else {
+          return (
+            <Line
+              key={index}
+              stroke={'transparent'}
+              strokeWidth={2}
+              x1={x(index)}
+              x2={x(index + 1)}
+              y1={y(array[index])}
+              y2={y(array[index + 1])}
+            />
+          )
+        }
+      }
+    }
+  });
+  };
+
+  const CustomDashedLines = ({ x, y, data }) => {
+
+    return data.map((value, index, array) => {
+
+      if ((index + 2 < array.length-2)) {
+
+        if((array[index]!=0)&& (array[index+1]!=0)){
+
+        }else if((array[index]==0)&& (array[index+1]==0)){
+
+        }
+        
+        else {
+          if(array[index]!=0){
+            for( var i=index+2; i<array.length-2; i++){
+              if((array[i]!= 0)) break;
+            }
+
+/*
+                console.log('=====================');
+                console.log(index);
+                console.log(i);
+                console.log(array[index]);
+                console.log(array[i]);*/
+
+
+
+              if(array[i]!=0){
+                return(
+                <Line
+                key={index}
+                stroke={'#E7E7E7'}
+                strokeWidth={2}
+                // strokeDasharray={ [ 4, 1 ] }
+                x1={x(index)}
+                x2={x(i)}
+                y1={y(array[index])}
+                y2={y(array[i])}
+              />);} 
+          }
+
+
+        }
+
+       
+      
+
+      }
+    });
+  };
+
+
+/*
+
+  const Custom2 = ({ x, y, data }) => {
+
+    return data.map((value, index, array) => {
+
+      if((index + 1 < array.length)&& (array[index] && array[index+1])){
+        if(setDotColorFunction(array[index])!=setDotColorFunction(array[index+1])){
+       
+          <Defs>
+            <ClipPath id="clip">
+            <Line
+                key={index}
+                stroke={'purple'}
+                strokeWidth={2}
+                x1={x(index)}
+                x2={x(index+1)}
+                y1={y(array[index])}
+                y2={y(array[index+1])}
+              />)
+             <Rect
+              x="0"
+              y="0"
+              width="100"
+              height="100"
+              clipPath="url(#clip)"
+            />
+            </ClipPath>
+          </Defs>
+         
+
+
+
+
+        }
+
+      }
+
+    });
+  };
+
+*/
+
+
+  function getTimeStamp() { 
+  
+    let y = date.getFullYear();
+    let m = date.getMonth() + 1;
+    let d = date.getDate();
+    let t =date.getHours();
+    //console.log('getTimeStamp: ' + date);
+    
+    //console.log('------------------ddd------hh-----88ddddd888888---------');
+    //console.log(y);
+    //console.log(m);
+    //console.log(d);
+   // console.log(t);
+    //console.log('props day =' +props.day);
+    const time_diff = date.getTimezoneOffset() / 60;
+    //console.log("시차  " + time_diff);
+    // 현재 날짜에서 주어진 parameter만큼 day 값을 뺐을 때 0 이하의 음수일 경우
+    // day, month, year 값 변경 사항을 보정해준다.
+    if (d - (props.day) <= 0) {
+      // m(month)값이 1, 2, 4, 6, 8, 9, 11일 경우
+      if (m === 1 || m === 2 || m === 4 || m === 6 || m === 8 || m === 9 || m === 11) {
+        if (m === 1) {
+          // m 값이 1일 경우
+          y -= 1; // y 값에서 -1 => 해가 바뀐 경우
+          m = 12; // m 값은 12로 설정 => 이전 해의 마지막 달
+        } else {
+          // 그 외
+          m -= 1; // m 값에서 -1
+        }
+        d += 31 - props.day; // 이전 월의 날짜 최대값이 31이므로 (현재 날짜 + 31 - parameter)를 d에 대입
+      }
+      // m 값이 5, 7, 10, 12일 경우
+      else if (m === 5 || m === 7 || m === 10 || m === 12) {
+        m -= 1; // m 값에서 -1
+        d += 30 - props.day; // 이전 월의 날짜 최대값이 30이므로 (현재 날짜 + 30 - parameter)를 d에 대입
+      }
+      // m 값이 3일 경우
+      else {
+        // y가 윤년일 경우
+        if ((y % 4 == 0 && y % 100 != 0) || y % 400 == 0) {
+          // 이전 월(2월)의 날짜 최대값이 29이므로 (현재 날짜 + 29 - parameter)를 d에 대입
+          d += 29 - props.day;
+        }
+        // y가 윤년이 아닐 경우
+        else {
+          // 이전 월(2월)의 날짜 최대값이 28이므로 (현재 날짜 + 28 - parameter)를 d에 대입
+          d += 28 - props.day;
+        }
+        m = 2; // m 값에 2 대입
+      }
+    }
+    // 현재 날짜에서 주어진 parameter만큼 day 값을 뺐을 때 1이상의 양수일 경우
+    else {
+      d = d - props.day; // 현재 날짜에서 parameter만큼 뺀 값을 d에 대입
+    }
+
+    // 'YYYY-MM-DD 00:00:00'의 형태의 문자열 s
+    let s = leadingZeros(y, 4) + '-' + leadingZeros(m, 2) + '-' + leadingZeros(d, 2) + 'T' + '23:59:00.000';
+    const year = parseInt(leadingZeros(y, 4));
+    const month = parseInt(leadingZeros(m, 2));
+    const day = parseInt(leadingZeros(d, 2));
+    const new_date = new Date();
+    new_date.setFullYear(year, month - 1, day);
+    new_date.setUTCHours(23);
+    new_date.setUTCMinutes(59);
+    new_date.setUTCSeconds(0);
+    new_date.setUTCMilliseconds(0);
+    
+ 
+    //console.log(year);
+    //console.log(month);
+    //console.log(day);
+  /*  console.log(new_date);
+    console.log(new_date.getHours());
+    console.log(new_date.getUTCHours());
+    console.log(new_date);
+    */
+    new_date.setUTCHours(new_date.getUTCHours() + time_diff - 9);
+    //console.log(new_date);
+ 
+        // console.log('=======================================');
+    // console.log(new_date.toISOString());
+    let s1 = new_date.toISOString()
+    //console.log(s1); 
+     //console.log('------------------ddd------hh-----88ddddd888888---------');
+    //console.log('getTimeStampresult : ' + s1)
+    return s1;
+  }
+
+  // getTimeStamp() 보다 parameter의 값이 1 더 큼
+  // getTimeStamp의 return값이 '2020-01-01'일 경우
+  // getTimeBefore의 return값은 '2019-12-31'이 됨.
+  function getTimeBefore() {
+    let y = date.getFullYear();
+    let m = date.getMonth() + 1;
+    let d = date.getDate();
+    //console.log('getTimeBefore1 : ' + date);
+    const time_diff = date.getTimezoneOffset() / 60;
+  ////console.log("-----------------------------------");
+//console.log('props day =' +props.day);
+
+    if (d - (props.day) <= 0) {
+      if (m === 1 || m === 2 || m === 4 || m === 6 || m === 8 || m === 9 || m === 11) {
+        if (m === 1) {
+          y -= 1;
+          m = 12;
+        } else {
+          m -= 1;
+        }
+        d += 31 - (props.day);
+      } else if (m === 5 || m === 7 || m === 10 || m === 12) {
+        m -= 1;
+        d += 30 - (props.day);
+      } else {
+        if ((y % 4 == 0 && y % 100 != 0) || y % 400 == 0) {
+          d += 29 - (props.day);
+        } else {
+          d += 28 - (props.day);
+        }
+        m = 2;
+      }
+    } else {
+      d = d - (props.day);
+    }
+    let s = leadingZeros(y, 4) + '-' + leadingZeros(m, 2) + '-' + leadingZeros(d, 2) + 'T' + '00:00:00.000';
+    const year = parseInt(leadingZeros(y, 4));
+    const month = parseInt(leadingZeros(m, 2));
+    const day = parseInt(leadingZeros(d, 2));
+    const new_date = new Date();
+    new_date.setFullYear(year, month - 1, day);
+    new_date.setUTCHours(0);
+    new_date.setUTCMinutes(0);
+    new_date.setUTCSeconds(0);
+    new_date.setUTCMilliseconds(0);
+    //console.log('------------------ddd------hh-----88ddddd888888---------');
+    //console.log(year);
+    // console.log(month);
+    //console.log(day);
+    // console.log(new_date);
+    //console.log(new_date.getHours());
+    //console.log(new_date.getUTCHours());
+    //new_date.setHours(new_date.getHours()+time_diff);
+    // console.log(new_date);
+
+    //console.log(new_date);
+    new_date.setUTCHours(new_date.getUTCHours() + time_diff - 9);
+    //console.log(new_date);
+    //console.log('=======================================');
+    //console.log(new_date.toISOString());
+    let s1 = new_date.toISOString()
+    //console.log('getTimeBeforeresult : ' + s1)
+    //console.log(s1);
+    //console.log("-----------------------------------");
+
+    return s1;
+  }
+
+
+  function leadingZeros(n, digits) {
+    let zero = '';
+    n = n.toString();
+
+    if (n.length < digits) {
+      for (let i = 0; i < digits - n.length; i++) zero += '0';
+    }
+    return zero + n;
+  }
+
+  // State에 따라서 getDotColor 함수를 변경해준다.
+  const setDotColorFunction = (value, index) => {
+    var getDotColor = {
+      // State가 Pm2.5일 경우
+      
+      Pm25: (value, index) => {
+        if(index==96){
+          return 'transparent';
+        }
+        else if (0 < value && value <= 15) {
+          return colors.azure;
+        } else if (16 <= value && value <= 35) {
+          return colors.darkLimeGreen;
+        } else if (36 <= value && value <= 75) {
+          return colors.lightOrange;
+        } else if (75 < value) {
+          return colors.coral;
+        }
+      },
+      // State가 Pm10일 경우
+      Pm10: (value) => {
+        if(index==96){
+          return 'transparent';
+        }
+        else if (0 < value && value <= 30) {
+          return colors.azure;
+        } else if (31 <= value && value <= 80) {
+          return colors.darkLimeGreen;
+        } else if (81 <= value && value <= 150) {
+          return colors.lightOrange;
+        } else if (150 < value) {
+          return colors.coral;
+        }
+      },
+      // State가 Temperature일 경우
+      Temperature: (value) => {
+
+        if(index==96){
+          return 'transparent';
+        }
+        else if (0 < value && value <= 9) {
+          return colors.azure;
+        } else if (9 < value && value <= 29) {
+          return colors.darkLimeGreen;
+        } else if (29 < value && value <= 49) {
+          return colors.lightOrange; x
+        } else if (49 < value) {
+          return colors.coral;
+        }
+      },
+      // State가 Humid일 경우
+      Humid: (value) => {
+       
+       
+        if(index==96){
+          return 'transparent';
+        }
+        else  if (0 < value && value <= 39) {
+          return colors.coral;
+        } else if (39 < value && value <= 60) {
+          return colors.darkLimeGreen;
+        } else if (60 < value && value <=100) {
+          return colors.azure;
+        }
+      },
+      // State가 VOCs일 경우
+      Tvoc: (value) => {
+        
+        
+        if(index==96){
+          return 'transparent';
+        }
+        else if (0 < value && value <= 249) {
+          return colors.azure;
+        } else if (250 <= value && value <= 449) {
+          return colors.darkLimeGreen;
+        } else if (449 < value) {
+          return colors.coral;
+        }
+      },
+      // State가 CO2일 경우
+      Co2: (value) => {
+
+        if(index==96){
+          return 'transparent';
+        }
+        else if (0 < value && value <= 800) {
+          return colors.azure;
+        } else if (801 <= value && value <= 1000) {
+          return colors.darkLimeGreen;
+        } else if (1001 <= value && value <= 2000) {
+          return colors.lightOrange;
+        } else if (2000 < value) {
+          return colors.coral;
+        }
+      },
+    };
+    // State에 맞는 getDotColor함수에 parameter로 value 전달 및 값 반환
+    return getDotColor[props.state](value, index);
+  };
+
+  // State별 수치별 Min/Max Box width 변경
+  const setMBoxWidth = (num) => {
+    var setWidth = {
+      // State가 Pm2.5일 경우
+      Pm25: (num) => {
+        num = num.toString();
+        var numDigit = 1;
+        numDigit = num.length;
+        if (numDigit === 1) {
+          return 90;
+        } else if (numDigit === 2) {
+          return 100;
+        } else if (numDigit === 3) {
+          return 110;
+        } else {
+          return 0;
+        }
+      },
+      // State가 Pm10일 경우
+      Pm10: (num) => {
+        num = num.toString();
+        var numDigit = num.length;
+        if (numDigit === 1) {
+          return 90;
+        } else if (numDigit === 2) {
+          return 100;
+        } else if (numDigit === 3) {
+          return 110;
+        } else {
+          return 0;
+        }
+      },
+      // State가 Temperature일 경우
+      Temperature: (num) => {
+        num = num.toString();
+        var numDigit = num.length;
+        if (numDigit === 1) {
+          return 70;
+        } else if (numDigit === 2) {
+          return 80;
+        } else if (numDigit === 3) {
+          return 90;
+        } else {
+          return 0;
+        }
+      },
+      // State가 Humid일 경우
+      Humid: (num) => {
+        num = num.toString();
+        var numDigit = num.length;
+        if (numDigit === 1) {
+          return 65;
+        } else if (numDigit === 2) {
+          return 75;
+        } else if (numDigit === 3) {
+          return 85;
+        } else {
+          return 0;
+        }
+      },
+      // State가 VOCs일 경우
+      Tvoc: (num) => {
+        num = num.toString();
+        var numDigit = num.length;
+        if (numDigit === 1) {
+          return 80;
+        } else if (numDigit === 2) {
+          return 90;
+        } else if (numDigit === 3) {
+          return 97;
+        } else {
+          return 0;
+        }
+      },
+      // State가 CO2일 경우
+      Co2: (num) => {
+        num = num.toString();
+        var numDigit = num.length;
+        if (numDigit === 1) {
+          return 80;
+        } else if (numDigit === 2) {
+          return 90;
+        } else if (numDigit === 3) {
+          return 100;
+        } else if (numDigit === 4) {
+          return 107;
+        } else {
+          return 0;
+        }
+      },
+    };
+    // State에 맞는 getDotColor함수에 parameter로 value 전달 및 값 반환
+    return setWidth[props.state](num);
+  };
+
+  // State에 따라 알맞은 Tooltip의 단위 반환
+  function setUnit(stateName) {
+    if (stateName === 'Pm25' || stateName === 'Pm10') {
+      return '㎍/㎥';
+    } else if (stateName === 'Tvoc') {
+      return 'ppb';
+    } else if (stateName === 'Co2') {
+      return 'ppm';
+    } else if (stateName === 'Temperature') {
+      return '°C';
+    } else if (stateName === 'Humid') {
+      return '%';
+    }
+  }
+
+  // device의 SerialNum을 통해 원하는 측정 요소의 AirInfo를 가져온다. (새로 만든 API)
+  /*
+    1. Request param
+    {
+      "serialNum" : "e693ba08a33c",
+      "startTime" : "2018-03-05T10:12:55.293",
+      "endTime":"2018-03-08T04:29:49.427",
+      "type":"Co2" // { "Co2", "Humid", "Pm10", "Pm25", "Temperature", "Tvoc" };
+    }
+    2. Response
+    [
+      {"ReportTime":"2018-03-05T10:29:42.18","Co2":407},
+      {"ReportTime":"2018-03-05T10:42:02.327","Co2":406}
+    ]
+  */
+
+
+
+  function makeDeviceAirInfo() {
+    try {
+      fetch('https://us-central1-pico-home.cloudfunctions.net/AirInfoByCond', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          serialNum: device[id].SerialNum,
+          startTime: getTimeBefore(),
+          endTime: getTimeStamp(),
+
+          type: props.state
+
+
+        }),
+      })
+        .then((response) => response.json())
+        .then((res) => {
+
+          //console.log(res);
+          setDeviceAirInfo(res);
+        });
+    } catch (exception) {
+
+      console.log('ERROR :: ', exception);
+
+
+    }
+  }
+
+
+
+  {/*
+  function makeDeviceAirInfo() {
+    fetch('https://us-central1-pico-home.cloudfunctions.net/GetAirInfo', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userid: userInfo.userid,
+        serialNum: device[id].SerialNum,
+        startTime: getTimeBefore(),
+        endTime: getTimeStamp(),
+        apiKey: userInfo.apiKey
+      }),
+    })
+      .then((response) => response.json())
+      .then((res) => {
+  
+       //console.log(res.Info.AirInfo[0].ReportTime);
+       const ReportTime = res.Info.AirInfo[0].ReportTime;
+
+       console.log(ReportTime);
+       const AirType= res.Info.AirInfo[0][props.state];
+       console.log(AirType);
+       setDeviceAirInfo(ReportTime, AirType);
+
+    });
+      
+  };
+  //////////////////*/}
+  // 그래프의 값을 Dot으로 표현
+  const Decorator = ({ x, y, data, line }) => {
+    //console.log(x);
+    //console.log(y);
+    //console.log(data);
+   
+    return data.map((value, index) => (
+    
+   
+    
+      <Circle
+        key={index}
+        cx={x(index)}
+        cy={y(value)}
+        r={2}
+        fill={setDotColorFunction(value,index)}
+        // Dot 크기가 작아서 그런건지 터치가 빠르게 반응을 안 한다.
+        onPress={() => {
+          setToolTipX(value);
+          setToolTipY(value);
+          setToolTipIndex(index);
+          setToolTipColor(setDotColorFunction(value));
+        }}
+      />
+      
+    )
+    );
+  };
+
+
+  // 일정 구간('YYYY-MM-DD 00:00:00' ~ 'YYYY-MM-DD 00:00:00')동안 측정된 AirInfo를 가져온다.
+  // deviceAirInfo를 업데이트
+  useEffect(() => {
+    makeDeviceAirInfo();
+  }, []);
+
+  // deviceAirInfo가 변경될 경우
+  useEffect(() => {
+
+    try {
+      /*
+      // deviceAirInfo에서 필요한 State값만 순차적으로 tempArray에 저장
+      for (let i = 0; i < deviceAirInfo.length; i++) {
+        console.log(deviceAirInfo[i]);
+        tempArray.push(deviceAirInfo[i][props.state]);
+      }
+      *///=====================
+      for (let i = 0; i < deviceAirInfo.length; i++) {
+        //console.log(deviceAirInfo[i]);
+        tempArray.push(deviceAirInfo[i][props.state]);
+        //let hours=[];
+        // hours[i]=deviceAirInfo[i]['ReportTime']
+        tempArrayTime.push(deviceAirInfo[i]['ReportTime'].substring(11, 16));
+      }
+      //==============================
+      //console.log(tempArray);
+      //console.log(tempArrayTime);
+
+      //console.log('i가 '+ i + ' 일때 '+ TimeArray[i]+ ' 이다');
+
+
+      for (let i = 0; i < 96; i++) {
+        for (let j = 0; j < tempArray.length; j++) {
+
+          //console.log('i is '+i+' anf j is '+j);
+          if (TimeArray[i] == tempArrayTime[j]) {
+            //console.log(i);
+            // console.log(TimeArray[i]);
+            // console.log(tempArray[j]);
+            finalArray[i] = tempArray[j];
+
+            //finalArray.push(tempArray[j]);
+            //console.log('final array is' +finalArray[i]);
+          }
+        }
+      }
+
+
+
+      for (let i = 0; i < 96; i++) {
+        if (finalArray[i] == null) {
+          finalArray[i] = 0;
+        }
+      }
+
+
+      setMinValue(Math.min.apply(null, finalArray)); // 최소값을 저장
+      setMaxValue(Math.max.apply(null, finalArray)); // 최대값을 저장
+      //console.log(maxValue);
+
+
+     for (let i = 0; i < 96; i++) {
+
+          if(finalArray[i]>max){
+            max=finalArray[i];
+          }
+        
+      }
+
+     for (let i = 0; i < 96; i++) {
+        if (finalArray[i] != 0) {
+          if(finalArray[i]<min){
+            min=finalArray[i];
+          }
+          cnt=cnt+1;
+        }
+      }
+
+      if(cnt==0){
+        min=0;
+      }
+
+
+
+
+  //console.log("min is " + max);
+  //console.log("min is " + min);
+
+  setMinValue(min);
+  setMaxValue(max);
+
+
+
+      // tempArray에 저장된 State값을 stateArray에 그대로 저장한다.
+
+      finalArray[96]= max+min;
+
+     // console.log(finalArray);
+
+
+
+      setStateArray(finalArray);
+      setIsLoading(true);
+
+      setTimeout(() => {
+        tempArray = [];
+        finalArray=[];
+      }, 1000);
+
+
+
+    } catch (exception) {
+      console.log(exception);
+    }
+
+
+  }, [deviceAirInfo]);
+
+
+
+  return (
+
+    <View style={{ flex: 1 }}>
+      {isLoading ? (
+        <LineChart
+          style={{ flex: 1 }}
+          data={stateArray}
+          gridMin={0}>
+
+          <CustomLines />
+          <CustomDashedLines/>
+          <Grid />
+          <Decorator />
+          <G>
+            <Rect
+              x={10}
+              y={15}
+              rx={5}
+              ry={5}
+              width={setMBoxWidth(maxValue)}
+              height={30}
+              fill={colors.white}
+              stroke={colors.veryLightPink}
+
+            />
+            <Text x={20} y={35} stroke={setDotColorFunction(maxValue)}>
+              Max : {maxValue} {setUnit(props.state)}
+            </Text>
+          </G>
+
+          <G>
+            <Rect
+              x={10}
+              y={295}
+              rx={5}
+              ry={5}
+              width={setMBoxWidth(minValue)}
+              height={30}
+              fill={colors.white}
+              stroke={colors.veryLightPink}
+            />
+            <Text x={20} y={315} stroke={setDotColorFunction(minValue)}>
+              Min : {minValue} {setUnit(props.state)}
+            </Text>
+          </G>
+          <Tooltip
+            tooltipX={tooltipX}
+            tooltipY={tooltipY}
+            color={tooltipColor}
+            index={tooltipIndex}
+            dataLength={stateArray.length}
+            state={props.state}
+          />
+        </LineChart>
+      ) : (
+          <View style={styles.indicator}>
+            <ActivityIndicator size="large" color={colors.azure} />
+          </View>
+        )}
+      <XAxis
+        style={{ height: xAxisHeight }}
+        data={xAxisDataNum}
+        formatLabel={(index) => xAxisDataNum[index]}
+        contentInset={{ left: 10, right: 10 }}
+        svg={axesSvg}
+      />
+
+    </View>
+
+  );
+};
+
+const styles = StyleSheet.create({
+  indicator: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
