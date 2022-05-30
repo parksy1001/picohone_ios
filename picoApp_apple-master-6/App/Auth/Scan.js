@@ -1,20 +1,17 @@
-import React, {useContext, useEffect, useState} from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  Image,
-  Dimensions,
-  ActivityIndicator,
-  // NativeModules,
-} from 'react-native';
-// import {TouchableOpacity} from 'react-native-gesture-handler';
-import {LanguageContext} from '../context';
-import {PicoDevice} from '../Main/Home/Connect/FindPicoToScan';
+import React, { useContext, useEffect, useState,  } from 'react';
+import {BackHandler} from 'react-native';
+import { StyleSheet, View, Text, Image, Dimensions, ActivityIndicator, NativeModules } from 'react-native';
+import { BackToFromContext, LanguageContext } from '../context';
+import { PicoDevice } from '../Main/Home/Connect/FindPicoToScan';
 import colors from '../src/colors';
+import cal from '../src/calculate';
+import cnt from '../src/constant';
 
-export const Scan = ({navigation}) => {
+
+export const Scan = ({ navigation }) => {
+
   const strings = useContext(LanguageContext);
+  const from = useContext(BackToFromContext);
 
   const [isLoading, setIsLoading] = useState(false);
   const [count, setCount] = useState(0);
@@ -26,6 +23,10 @@ export const Scan = ({navigation}) => {
   const [vocs, setVOCs] = useState(PicoDevice.data != null ? '-' : 0);
   const [co2, setCO2] = useState(PicoDevice.data != null ? '-' : 0);
 
+  function handleBackButtonClick() {
+    navigation.navigate('Connect');
+    return true;
+  }
   // 1초 마다 블루투스 연결된 PiCO로 부터 데이터를 읽어오기 위해 호출
   function tick() {
     update();
@@ -39,6 +40,7 @@ export const Scan = ({navigation}) => {
     setHumd(PicoDevice.data != null ? PicoDevice.data.humd.value : 0);
     setVOCs(PicoDevice.data != null ? PicoDevice.data.vocs.value : 0);
     setCO2(PicoDevice.data != null ? PicoDevice.data.co2.value : 0);
+
     if (count > 5) {
       setIsLoading(true);
     }
@@ -48,27 +50,25 @@ export const Scan = ({navigation}) => {
   }
 
   const getPm25Color = (value) => {
-    if (0 <= value && value <= 15) {
+    if (cal.boundaryPM25(value) === cnt.PM25_GOOD)
       return colors.azure;
-    } else if (16 <= value && value <= 35) {
+    else if (cal.boundaryPM25(value) === cnt.PM25_MOD)
       return colors.darkLimeGreen;
-    } else if (36 <= value && value <= 75) {
+    else if (cal.boundaryPM25(value) === cnt.PM25_BAD)
       return colors.lightOrange;
-    } else {
+    else if (cal.boundaryPM25(value) === cnt.PM25_VERY_BAD)
       return colors.coral;
-    }
   };
 
   const getPm25Picture = (value) => {
-    if (0 <= value && value <= 15) {
+    if (cal.boundaryPM25(value) === cnt.PM25_GOOD)
       return require('../../Assets/img/icPm25Blue.png');
-    } else if (16 <= value && value <= 35) {
+    else if (cal.boundaryPM25(value) === cnt.PM25_MOD)
       return require('../../Assets/img/icPm25Green.png');
-    } else if (36 <= value && value <= 75) {
+    else if (cal.boundaryPM25(value) === cnt.PM25_BAD)
       return require('../../Assets/img/icPm25Orange.png');
-    } else {
+    else if (cal.boundaryPM25(value) === cnt.PM25_VERY_BAD)
       return require('../../Assets/img/icPm25Red.png');
-    }
   };
 
   const getPm10Color = (value) => {
@@ -191,159 +191,83 @@ export const Scan = ({navigation}) => {
     };
   });
 
+  useEffect(() => {
+    BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
+    return () => {
+      BackHandler.removeEventListener('hardwareBackPress', handleBackButtonClick);
+    };
+  }, []);
+
   return (
     <View style={styles.container}>
-      {/* 
-      <View style={styles.backButton}>
-        <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
-          <Image source={require('../../Assets/img/icArrowLeft.png')} />
-        </TouchableOpacity>
-      </View>
-      */}
+
       {isLoading ? (
         <View>
-          <View style={{height: height * 0.05}}></View>
+          <View style={{ height: height * 0.05 }}></View>
           <View style={styles.box}>
             <View style={styles.stateBox}>
-              <View
-                style={[
-                  styles.bgStateBar,
-                  {backgroundColor: getPm25Color(pm25)},
-                ]}></View>
+              <View style={[styles.bgStateBar, { backgroundColor: getPm25Color(pm25) }]}></View>
               <Image style={styles.icPm25} source={getPm25Picture(pm25)} />
-              <Text style={[styles.pm25, {color: getPm25Color(pm25)}]}>
-                {strings.scan_label_pm25}
-              </Text>
+              <Text style={[styles.pm25, { color: getPm25Color(pm25) }]}>{strings.scan_label_pm25}</Text>
               <View style={styles.pm25ValueView}>
-                <Text style={[styles.pm25Value, {color: getPm25Color(pm25)}]}>
-                  {pm25}
-                </Text>
+                <Text style={[styles.pm25Value, { color: getPm25Color(pm25) }]}>{pm25}</Text>
               </View>
-              <Text style={[styles.pm25m3, {color: getPm25Color(pm25)}]}>
-                μg/m3
-              </Text>
+              <Text style={[styles.pm25m3, { color: getPm25Color(pm25) }]}>μg/m3</Text>
             </View>
           </View>
           <View style={styles.box}>
             <View style={styles.stateBox}>
-              <View
-                style={[
-                  styles.bgStateBar,
-                  {backgroundColor: getPm10Color(pm10)},
-                ]}></View>
+              <View style={[styles.bgStateBar, { backgroundColor: getPm10Color(pm10) }]}></View>
               <Image style={styles.icPm10} source={getPm10Picture(pm10)} />
-              <Text style={[styles.pm10, {color: getPm10Color(pm10)}]}>
-                {strings.scan_label_pm10}
-              </Text>
+              <Text style={[styles.pm10, { color: getPm10Color(pm10) }]}>{strings.scan_label_pm10}</Text>
               <View style={styles.pm10ValueView}>
-                <Text style={[styles.pm10Value, {color: getPm10Color(pm10)}]}>
-                  {pm10}
-                </Text>
+                <Text style={[styles.pm10Value, { color: getPm10Color(pm10) }]}>{pm10}</Text>
               </View>
-              <Text style={[styles.pm10m3, {color: getPm10Color(pm10)}]}>
-                μg/m3
-              </Text>
+              <Text style={[styles.pm10m3, { color: getPm10Color(pm10) }]}>μg/m3</Text>
             </View>
           </View>
           <View style={styles.box}>
             <View style={styles.stateBox}>
-              <View
-                style={[
-                  styles.bgStateBar,
-                  {backgroundColor: getTemperatureColor(temp)},
-                ]}></View>
-              <Image
-                style={styles.icTemp}
-                source={getTemperaturePicture(temp)}
-              />
-              <Text
-                style={[
-                  styles.temperature,
-                  {color: getTemperatureColor(temp)},
-                ]}>
-                {strings.scan_label_temperature}
-              </Text>
+              <View style={[styles.bgStateBar, { backgroundColor: getTemperatureColor(temp) }]}></View>
+              <Image style={styles.icTemp} source={getTemperaturePicture(temp)} />
+              <Text style={[styles.temperature, { color: getTemperatureColor(temp) }]}>{strings.scan_label_temperature}</Text>
               <View style={styles.tempValueView}>
-                <Text
-                  style={[
-                    styles.temperatureValue,
-                    {color: getTemperatureColor(temp)},
-                  ]}>
-                  {temp}
-                </Text>
+                <Text style={[styles.temperatureValue, { color: getTemperatureColor(temp) }]}>{temp}</Text>
               </View>
-              <Text
-                style={[
-                  styles.temperatureC,
-                  {color: getTemperatureColor(temp)},
-                ]}>
-                °C
-              </Text>
+              <Text style={[styles.temperatureC, { color: getTemperatureColor(temp) }]}>°C</Text>
             </View>
           </View>
           <View style={styles.box}>
             <View style={styles.stateBox}>
-              <View
-                style={[
-                  styles.bgStateBar,
-                  {backgroundColor: getHumidColor(humd)},
-                ]}></View>
+              <View style={[styles.bgStateBar, { backgroundColor: getHumidColor(humd) }]}></View>
               <Image style={styles.icHumdi} source={getHumidPicture(humd)} />
-              <Text style={[styles.humidity, {color: getHumidColor(humd)}]}>
-                {strings.scan_label_humidity}
-              </Text>
+              <Text style={[styles.humidity, { color: getHumidColor(humd) }]}>{strings.scan_label_humidity}</Text>
               <View style={styles.humdiValueView}>
-                <Text
-                  style={[styles.humidityValue, {color: getHumidColor(humd)}]}>
-                  {humd}
-                </Text>
+                <Text style={[styles.humidityValue, { color: getHumidColor(humd) }]}>{humd}</Text>
               </View>
-              <Text
-                style={[styles.humidityPercent, {color: getHumidColor(humd)}]}>
-                %
-              </Text>
+              <Text style={[styles.humidityPercent, { color: getHumidColor(humd) }]}>%</Text>
             </View>
           </View>
           <View style={styles.box}>
             <View style={styles.stateBox}>
-              <View
-                style={[
-                  styles.bgStateBar,
-                  {backgroundColor: getTvocColor(vocs)},
-                ]}></View>
+              <View style={[styles.bgStateBar, { backgroundColor: getTvocColor(vocs) }]}></View>
               <Image style={styles.icVoc} source={getTvocPicture(vocs)} />
-              <Text style={[styles.Voc, {color: getTvocColor(vocs)}]}>
-                {strings.scan_label_vocs}
-              </Text>
+              <Text style={[styles.Voc, { color: getTvocColor(vocs) }]}>{strings.scan_label_vocs}</Text>
               <View style={styles.vocValueView}>
-                <Text style={[styles.VocValue, {color: getTvocColor(vocs)}]}>
-                  {vocs}
-                </Text>
+                <Text style={[styles.VocValue, { color: getTvocColor(vocs) }]}>{vocs}</Text>
               </View>
-              <Text style={[styles.Vocppb, {color: getTvocColor(vocs)}]}>
-                ppb
-              </Text>
+              <Text style={[styles.Vocppb, { color: getTvocColor(vocs) }]}>ppb</Text>
             </View>
           </View>
           <View style={styles.box}>
             <View style={styles.stateBox}>
-              <View
-                style={[
-                  styles.bgStateBar,
-                  {backgroundColor: getCo2Color(co2)},
-                ]}></View>
+              <View style={[styles.bgStateBar, { backgroundColor: getCo2Color(co2) }]}></View>
               <Image style={styles.icCO2} source={getCo2Picture(co2)} />
-              <Text style={[styles.CO2, {color: getCo2Color(co2)}]}>
-                {strings.scan_label_co2}
-              </Text>
+              <Text style={[styles.CO2, { color: getCo2Color(co2) }]}>{strings.scan_label_co2}</Text>
               <View style={styles.co2ValueView}>
-                <Text style={[styles.CO2Value, {color: getCo2Color(co2)}]}>
-                  {co2}
-                </Text>
+                <Text style={[styles.CO2Value, { color: getCo2Color(co2) }]}>{co2}</Text>
               </View>
-              <Text style={[styles.CO2ppm, {color: getCo2Color(co2)}]}>
-                ppm
-              </Text>
+              <Text style={[styles.CO2ppm, { color: getCo2Color(co2) }]}>ppm</Text>
             </View>
           </View>
         </View>
@@ -356,7 +280,8 @@ export const Scan = ({navigation}) => {
   );
 };
 
-const {width, height} = Dimensions.get('window');
+const locale = NativeModules.I18nManager.localeIdentifier;
+const { width, height } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {
@@ -373,12 +298,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: colors.white,
   },
-  backButton: {
-    position: 'absolute',
-    width: width * 0.9,
-    top: height * 0.055,
-    left: width * 0.04,
-  },
+  backButton: { position: 'absolute', width: width * 0.9, top: height * 0.055, left: width * 0.04 },
   box: {
     width: width * 0.9,
     height: height * 0.1126,

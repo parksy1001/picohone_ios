@@ -5,22 +5,23 @@ import { LineChart, Grid, XAxis, BarChart, AreaChart, Path } from 'react-native-
 import { Circle, G, Rect, Text, ClipPath, Line, Defs, Svg } from 'react-native-svg';
 import colors from '../src/colors';
 import Tooltip from './Tooltip';
-import { color } from 'react-native-reanimated';
+import cal from '../src/calculate';
+import cnt from '../src/constant';
 
 export const Graph = (props) => {
   let tempArray = [];
   let TimeArray = [
-    "06:00", "06:15", "06:30", "06:45", "07:00", "07:15", "07:30", "07:45", "08:00", "08:15", "08:30", "08:45", "09:00", "09:15", "09:30", "09:45",
-    "10:00", "10:15", "10:30", "10:45", "11:00", "11:15", "11:30", "11:45", "12:00", "12:15", "12:30", "12:45", "13:00", "13:15", "13:30", "13:45",
-    "14:00", "14:15", "14:30", "14:45", "15:00", "15:15", "15:30", "15:45", "16:00", "16:15", "16:30", "16:45", "17:00", "17:15", "17:30", "17:45",
+    "15:00", "15:15", "15:30", "15:45", "16:00", "16:15", "16:30", "16:45", "17:00", "17:15", "17:30", "17:45",
     "18:00", "18:15", "18:30", "18:45", "19:00", "19:15", "19:30", "19:45", "20:00", "20:15", "20:30", "20:45", "21:00", "21:15", "21:30", "21:45",
     "22:00", "22:15", "22:30", "22:45", "23:00", "23:15", "23:30", "23:45", "00:00", "00:15", "00:30", "00:45", "01:00", "01:15", "01:30", "01:45",
     "02:00", "02:15", "02:30", "02:45", "03:00", "03:15", "03:30", "03:45", "04:00", "04:15", "04:30", "04:45", "05:00", "05:15", "05:30", "05:45",
-    "val"
+    "06:00", "06:15", "06:30", "06:45", "07:00", "07:15", "07:30", "07:45", "08:00", "08:15", "08:30", "08:45", "09:00", "09:15", "09:30", "09:45",
+    "10:00", "10:15", "10:30", "10:45", "11:00", "11:15", "11:30", "11:45", "12:00", "12:15", "12:30", "12:45", "13:00", "13:15", "13:30", "13:45",
+    "14:00", "14:15", "14:30", "14:45", "val"
   ];
   let min=10000;
   let max=0;
-  let cnt=0;
+  let count=0;
   let tempArrayTime = [];
   let finalArray = [];
   const date = new Date();
@@ -47,80 +48,6 @@ export const Graph = (props) => {
   const [stateArray, setStateArray] = useState([]);
   const [minValue, setMinValue] = useState(0);
   const [maxValue, setMaxValue] = useState(0);
-  /*
-    let max =-1000
-    let min = 1000
-    for(let i = 0; i < data.length; i++){
-        if(max < data[i])
-        {
-            max = data[i]
-        }
-        if(min > data[i])
-        {
-            min =data[i]
-        }
-    }
-    if(min<0)
-    {
-        min = min *(-1)
-    }
-    const totalLength=(max+min)
-    const heightGrap = 200
-    const indexToClipFrom = 10
-    const limitLineValue = 28
-    let upperColorLimitValueInNumber = ((heightGrap/totalLength)*(max-limitLineValue))/2
-    let upperColorLimit = upperColorLimitValueInNumber.toString()+"%"
-  
-  const Clips = ({ x, y, width }) => (
-    <Defs key={'clips'}>
-      <ClipPath id="clip-path-1">
-        <Rect x={'0'} y={'0'} width={width} height={'100%'} />
-      </ClipPath>
-      <ClipPath id={'clip-path-2'}>
-        <Rect x={x(0)} y={'0'} width={width} height={'100%'} />
-      </ClipPath>
-    </Defs>
-  )
-
-  const HorizontalLine = (({ y }) => (
-    <Line
-      //key={ 'zero-axis' }
-      x1={'0%'}
-      x2={'100%'}
-      y1={y(16)}
-      y2={y(16)}
-      stroke={'grey'}
-      strokeDasharray={[4, 8]}
-      strokeWidth={2}
-    />
-  ))
-
-
-  // Line extras:
-  const DashedLine = ({ line }) => (
-    <Path
-      key={'line-1'}
-      d={line}
-      stroke={'red'}
-      strokeWidth={1}
-      fill={'none'}
-      //strokeDasharray={ [ 5, 0 ] }
-      clipPath={'url(#clip-path-2)'}
-    />
-  )
-
-  const Shadow = ({ line }) => (
-    <Path
-      y={3}
-      key={'shadow-1'}
-      d={line}
-      stroke={'rgba(134, 65, 244, 0.2)'}
-      strokeWidth={5}
-      fill={'none'}
-    />
-  )
-  */
-
 
   const CustomLines = ({ x, y, data }) => {
 
@@ -128,53 +55,19 @@ export const Graph = (props) => {
 
       if (index + 1 < array.length-1 ) {
         if (array[index] && array[index + 1]) {
-          return (
-            <Line
-              key={index}
-              stroke={'#E7E7E7'}
-              strokeWidth={2}
-            
-              x1={x(index)}
-              x2={x(index + 1)}
-              y1={y(array[index])}
-              y2={y(array[index + 1])}
-            />
-          )
-
-
+          return (<Line key={index} stroke={'#E7E7E7'} strokeWidth={2} x1={x(index)} x2={x(index + 1)} y1={y(array[index])} y2={y(array[index + 1])}/>)
         } else {
           if ((array[index] == 0) && (0 < index)) {
             if (array[index - 1] && array[index + 1]) {
-              return (
-                <Line
-                  key={index}
-                  stroke={'#E7E7E7'}
-                  strokeWidth={2}
-                  x1={x(index-1)}
-                  x2={x(index + 1)}
-                  y1={y(array[index-1])}
-                  y2={y(array[index + 1])}
-                />
-              )
+              return (<Line key={index} stroke={'#E7E7E7'} strokeWidth={2} x1={x(index-1)} x2={x(index + 1)} y1={y(array[index-1])} y2={y(array[index + 1])}/>)
             }
-          } 
-else {
-          return (
-            <Line
-              key={index}
-              stroke={'transparent'}
-              strokeWidth={2}
-              x1={x(index)}
-              x2={x(index + 1)}
-              y1={y(array[index])}
-              y2={y(array[index + 1])}
-            />
-          )
+          } else {
+             return ( <Line key={index} stroke={'transparent'} strokeWidth={2} x1={x(index)} x2={x(index + 1)} y1={y(array[index])} y2={y(array[index + 1])}/>)
+            }
+         }
         }
-      }
-    }
-  });
-  };
+      });
+    };
 
   const CustomDashedLines = ({ x, y, data }) => {
 
@@ -186,108 +79,28 @@ else {
 
         }else if((array[index]==0)&& (array[index+1]==0)){
 
-        }
-        
-        else {
+        }else {
           if(array[index]!=0){
             for( var i=index+2; i<array.length-2; i++){
               if((array[i]!= 0)) break;
             }
-
-/*
-                console.log('=====================');
-                console.log(index);
-                console.log(i);
-                console.log(array[index]);
-                console.log(array[i]);*/
-
-
-
-              if(array[i]!=0){
-                return(
-                <Line
-                key={index}
-                stroke={'#E7E7E7'}
-                strokeWidth={2}
-                // strokeDasharray={ [ 4, 1 ] }
-                x1={x(index)}
-                x2={x(i)}
-                y1={y(array[index])}
-                y2={y(array[i])}
-              />);} 
-          }
-
-
+            if(array[i]!=0){
+                return(<Line key={index} stroke={'#E7E7E7'} strokeWidth={2} x1={x(index)} x2={x(i)} y1={y(array[index])} y2={y(array[i])}/>);
+              }
+            }
         }
-
-       
-      
-
       }
     });
   };
 
 
-/*
-
-  const Custom2 = ({ x, y, data }) => {
-
-    return data.map((value, index, array) => {
-
-      if((index + 1 < array.length)&& (array[index] && array[index+1])){
-        if(setDotColorFunction(array[index])!=setDotColorFunction(array[index+1])){
-       
-          <Defs>
-            <ClipPath id="clip">
-            <Line
-                key={index}
-                stroke={'purple'}
-                strokeWidth={2}
-                x1={x(index)}
-                x2={x(index+1)}
-                y1={y(array[index])}
-                y2={y(array[index+1])}
-              />)
-             <Rect
-              x="0"
-              y="0"
-              width="100"
-              height="100"
-              clipPath="url(#clip)"
-            />
-            </ClipPath>
-          </Defs>
-         
-
-
-
-
-        }
-
-      }
-
-    });
-  };
-
-*/
-
-
-  function getTimeStamp() { 
-  
+  function getTimeStamp() {
     let y = date.getFullYear();
     let m = date.getMonth() + 1;
     let d = date.getDate();
     let t =date.getHours();
-    //console.log('getTimeStamp: ' + date);
-    
-    //console.log('------------------ddd------hh-----88ddddd888888---------');
-    //console.log(y);
-    //console.log(m);
-    //console.log(d);
-   // console.log(t);
-    //console.log('props day =' +props.day);
+
     const time_diff = date.getTimezoneOffset() / 60;
-    //console.log("시차  " + time_diff);
     // 현재 날짜에서 주어진 parameter만큼 day 값을 뺐을 때 0 이하의 음수일 경우
     // day, month, year 값 변경 사항을 보정해준다.
     if (d - (props.day) <= 0) {
@@ -339,25 +152,11 @@ else {
     new_date.setUTCMinutes(59);
     new_date.setUTCSeconds(0);
     new_date.setUTCMilliseconds(0);
-    
- 
-    //console.log(year);
-    //console.log(month);
-    //console.log(day);
-  /*  console.log(new_date);
-    console.log(new_date.getHours());
-    console.log(new_date.getUTCHours());
-    console.log(new_date);
-    */
-    new_date.setUTCHours(new_date.getUTCHours() + time_diff - 9);
-    //console.log(new_date);
- 
-        // console.log('=======================================');
-    // console.log(new_date.toISOString());
+    new_date.setUTCHours(new_date.getUTCHours()+time_diff);
+
     let s1 = new_date.toISOString()
-    //console.log(s1); 
-     //console.log('------------------ddd------hh-----88ddddd888888---------');
-    //console.log('getTimeStampresult : ' + s1)
+    s1= s1.substring(0,4)+s1.substring(5,7)+s1.substring(8,10)+s1.substring(11,13)+s1.substring(14,16)+s1.substring(17,19);
+    console.log('getTimeStampresult : ' + s1);
     return s1;
   }
 
@@ -368,10 +167,8 @@ else {
     let y = date.getFullYear();
     let m = date.getMonth() + 1;
     let d = date.getDate();
-    //console.log('getTimeBefore1 : ' + date);
+
     const time_diff = date.getTimezoneOffset() / 60;
-  ////console.log("-----------------------------------");
-//console.log('props day =' +props.day);
 
     if (d - (props.day) <= 0) {
       if (m === 1 || m === 2 || m === 4 || m === 6 || m === 8 || m === 9 || m === 11) {
@@ -390,12 +187,13 @@ else {
           d += 29 - (props.day);
         } else {
           d += 28 - (props.day);
-        }
+        }z
         m = 2;
       }
     } else {
       d = d - (props.day);
     }
+
     let s = leadingZeros(y, 4) + '-' + leadingZeros(m, 2) + '-' + leadingZeros(d, 2) + 'T' + '00:00:00.000';
     const year = parseInt(leadingZeros(y, 4));
     const month = parseInt(leadingZeros(m, 2));
@@ -406,26 +204,11 @@ else {
     new_date.setUTCMinutes(0);
     new_date.setUTCSeconds(0);
     new_date.setUTCMilliseconds(0);
-    //console.log('------------------ddd------hh-----88ddddd888888---------');
-    //console.log(year);
-    // console.log(month);
-    //console.log(day);
-    // console.log(new_date);
-    //console.log(new_date.getHours());
-    //console.log(new_date.getUTCHours());
-    //new_date.setHours(new_date.getHours()+time_diff);
-    // console.log(new_date);
+    new_date.setUTCHours(new_date.getUTCHours()+time_diff);
+    let s1 = new_date.toISOString();
 
-    //console.log(new_date);
-    new_date.setUTCHours(new_date.getUTCHours() + time_diff - 9);
-    //console.log(new_date);
-    //console.log('=======================================');
-    //console.log(new_date.toISOString());
-    let s1 = new_date.toISOString()
-    //console.log('getTimeBeforeresult : ' + s1)
-    //console.log(s1);
-    //console.log("-----------------------------------");
-
+    s1= s1.substring(0,4)+s1.substring(5,7)+s1.substring(8,10)+s1.substring(11,13)+s1.substring(14,16)+s1.substring(17,19);
+    console.log('getTimeBeforeresult : ' + s1)
     return s1;
   }
 
@@ -444,20 +227,19 @@ else {
   const setDotColorFunction = (value, index) => {
     var getDotColor = {
       // State가 Pm2.5일 경우
-      
+
       Pm25: (value, index) => {
         if(index==96){
           return 'transparent';
         }
-        else if (0 < value && value <= 15) {
+        if (cal.boundaryPM25(value) === cnt.PM25_GOOD)
           return colors.azure;
-        } else if (16 <= value && value <= 35) {
+        else if (cal.boundaryPM25(value) === cnt.PM25_MOD)
           return colors.darkLimeGreen;
-        } else if (36 <= value && value <= 75) {
+        else if (cal.boundaryPM25(value) === cnt.PM25_BAD)
           return colors.lightOrange;
-        } else if (75 < value) {
+        else if (cal.boundaryPM25(value) === cnt.PM25_VERY_BAD)
           return colors.coral;
-        }
       },
       // State가 Pm10일 경우
       Pm10: (value) => {
@@ -476,7 +258,6 @@ else {
       },
       // State가 Temperature일 경우
       Temperature: (value) => {
-
         if(index==96){
           return 'transparent';
         }
@@ -492,8 +273,6 @@ else {
       },
       // State가 Humid일 경우
       Humid: (value) => {
-       
-       
         if(index==96){
           return 'transparent';
         }
@@ -501,14 +280,12 @@ else {
           return colors.coral;
         } else if (39 < value && value <= 60) {
           return colors.darkLimeGreen;
-        } else if (60 < value && value <=100) {
+        } else if (60 < value && value <= 100) {
           return colors.azure;
         }
       },
       // State가 VOCs일 경우
       Tvoc: (value) => {
-        
-        
         if(index==96){
           return 'transparent';
         }
@@ -516,13 +293,12 @@ else {
           return colors.azure;
         } else if (250 <= value && value <= 449) {
           return colors.darkLimeGreen;
-        } else if (449 < value) {
+        } else if (450 <= value) {
           return colors.coral;
         }
       },
       // State가 CO2일 경우
       Co2: (value) => {
-
         if(index==96){
           return 'transparent';
         }
@@ -651,58 +427,34 @@ else {
     }
   }
 
-  // device의 SerialNum을 통해 원하는 측정 요소의 AirInfo를 가져온다. (새로 만든 API)
-  /*
-    1. Request param
-    {
-      "serialNum" : "e693ba08a33c",
-      "startTime" : "2018-03-05T10:12:55.293",
-      "endTime":"2018-03-08T04:29:49.427",
-      "type":"Co2" // { "Co2", "Humid", "Pm10", "Pm25", "Temperature", "Tvoc" };
-    }
-    2. Response
-    [
-      {"ReportTime":"2018-03-05T10:29:42.18","Co2":407},
-      {"ReportTime":"2018-03-05T10:42:02.327","Co2":406}
-    ]
-  */
-
-
-
   function makeDeviceAirInfo() {
     try {
-      fetch('https://us-central1-pico-home.cloudfunctions.net/AirInfoByCond', {
+      fetch('http://mqtt.brilcom.com:8080/mqtt/GetAirQualityForChart', {
         method: 'POST',
+
         headers: {
           Accept: 'application/json',
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json',//서버로 보낼 때 무엇으로 보내는 것인지 알려줌
         },
         body: JSON.stringify({
           serialNum: device[id].SerialNum,
           startTime: getTimeBefore(),
           endTime: getTimeStamp(),
-
           type: props.state
-
-
         }),
       })
         .then((response) => response.json())
         .then((res) => {
-
-          //console.log(res);
           setDeviceAirInfo(res);
-        });
+       });
     } catch (exception) {
-
-      console.log('ERROR :: ', exception);
-
-
+      console.log('ERROR :: ', 'GetAirQualityForChart', exception);
     }
   }
 
 
 
+  //mqtt 이전 버전
   {/*
   function makeDeviceAirInfo() {
     fetch('https://us-central1-pico-home.cloudfunctions.net/GetAirInfo', {
@@ -721,7 +473,7 @@ else {
     })
       .then((response) => response.json())
       .then((res) => {
-  
+
        //console.log(res.Info.AirInfo[0].ReportTime);
        const ReportTime = res.Info.AirInfo[0].ReportTime;
 
@@ -731,19 +483,12 @@ else {
        setDeviceAirInfo(ReportTime, AirType);
 
     });
-      
+
   };
-  //////////////////*/}
+*/}
   // 그래프의 값을 Dot으로 표현
   const Decorator = ({ x, y, data, line }) => {
-    //console.log(x);
-    //console.log(y);
-    //console.log(data);
-   
     return data.map((value, index) => (
-    
-   
-    
       <Circle
         key={index}
         cx={x(index)}
@@ -756,12 +501,9 @@ else {
           setToolTipY(value);
           setToolTipIndex(index);
           setToolTipColor(setDotColorFunction(value));
-        }}
-      />
-      
-    )
-    );
-  };
+        }}/>
+        ));
+      };
 
 
   // 일정 구간('YYYY-MM-DD 00:00:00' ~ 'YYYY-MM-DD 00:00:00')동안 측정된 AirInfo를 가져온다.
@@ -774,44 +516,18 @@ else {
   useEffect(() => {
 
     try {
-      /*
-      // deviceAirInfo에서 필요한 State값만 순차적으로 tempArray에 저장
       for (let i = 0; i < deviceAirInfo.length; i++) {
-        console.log(deviceAirInfo[i]);
         tempArray.push(deviceAirInfo[i][props.state]);
-      }
-      *///=====================
-      for (let i = 0; i < deviceAirInfo.length; i++) {
-        //console.log(deviceAirInfo[i]);
-        tempArray.push(deviceAirInfo[i][props.state]);
-        //let hours=[];
-        // hours[i]=deviceAirInfo[i]['ReportTime']
         tempArrayTime.push(deviceAirInfo[i]['ReportTime'].substring(11, 16));
       }
-      //==============================
-      //console.log(tempArray);
-      //console.log(tempArrayTime);
-
-      //console.log('i가 '+ i + ' 일때 '+ TimeArray[i]+ ' 이다');
-
 
       for (let i = 0; i < 96; i++) {
         for (let j = 0; j < tempArray.length; j++) {
-
-          //console.log('i is '+i+' anf j is '+j);
           if (TimeArray[i] == tempArrayTime[j]) {
-            //console.log(i);
-            // console.log(TimeArray[i]);
-            // console.log(tempArray[j]);
             finalArray[i] = tempArray[j];
-
-            //finalArray.push(tempArray[j]);
-            //console.log('final array is' +finalArray[i]);
           }
         }
       }
-
-
 
       for (let i = 0; i < 96; i++) {
         if (finalArray[i] == null) {
@@ -819,52 +535,31 @@ else {
         }
       }
 
-
       setMinValue(Math.min.apply(null, finalArray)); // 최소값을 저장
       setMaxValue(Math.max.apply(null, finalArray)); // 최대값을 저장
-      //console.log(maxValue);
 
-
-     for (let i = 0; i < 96; i++) {
-
-          if(finalArray[i]>max){
+      for (let i = 0; i < 96; i++) {
+        if(finalArray[i]>max){
             max=finalArray[i];
-          }
-        
+        }
       }
 
-     for (let i = 0; i < 96; i++) {
+      for (let i = 0; i < 96; i++) {
         if (finalArray[i] != 0) {
           if(finalArray[i]<min){
             min=finalArray[i];
           }
-          cnt=cnt+1;
+          count++
         }
       }
 
-      if(cnt==0){
+      if(count === 0){
         min=0;
       }
 
-
-
-
-  //console.log("min is " + max);
-  //console.log("min is " + min);
-
-  setMinValue(min);
-  setMaxValue(max);
-
-
-
-      // tempArray에 저장된 State값을 stateArray에 그대로 저장한다.
-
+      setMinValue(min);
+      setMaxValue(max);
       finalArray[96]= max+min;
-
-     // console.log(finalArray);
-
-
-
       setStateArray(finalArray);
       setIsLoading(true);
 
@@ -873,19 +568,13 @@ else {
         finalArray=[];
       }, 1000);
 
-
-
     } catch (exception) {
-      console.log(exception);
+      //console.log(exception);
     }
-
 
   }, [deviceAirInfo]);
 
-
-
   return (
-
     <View style={{ flex: 1 }}>
       {isLoading ? (
         <LineChart
@@ -907,7 +596,6 @@ else {
               height={30}
               fill={colors.white}
               stroke={colors.veryLightPink}
-
             />
             <Text x={20} y={35} stroke={setDotColorFunction(maxValue)}>
               Max : {maxValue} {setUnit(props.state)}

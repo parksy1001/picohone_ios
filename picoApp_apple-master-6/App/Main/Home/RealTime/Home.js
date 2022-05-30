@@ -27,6 +27,8 @@ import Geolocation from '@react-native-community/geolocation';
 import Geocoder from 'react-native-geocoding';
 import Modal from 'react-native-modal';
 import colors from '../../../src/colors';
+import cal from '../../../src/calculate';
+import cnt from '../../../src/constant';
 
 export const Home = ({navigation}) => {
   const strings = useContext(LanguageContext);
@@ -132,55 +134,51 @@ export const Home = ({navigation}) => {
    */
 
   // Background color값 반환
-  const getBackgroundState = (props) => {
-    if (0 <= props && props <= 15) {
+  const getBackgroundState = value => {
+    if (cal.boundaryPM25(value) === cnt.PM25_GOOD)
       return 'rgba(0, 172, 255, 0.3)';
-    } else if (16 <= props && props <= 35) {
+    else if (cal.boundaryPM25(value) === cnt.PM25_MOD)
       return 'rgba(121, 191, 0, 0.3)';
-    } else if (36 <= props && props <= 75) {
+    else if (cal.boundaryPM25(value) === cnt.PM25_BAD)
       return 'rgba(255, 160, 64, 0.3)';
-    } else {
+    else if (cal.boundaryPM25(value) === cnt.PM25_VERY_BAD)
       return 'rgba(252, 83, 69, 0.3)';
-    }
   };
 
   // Background Layer1의 color에 해당하는 이미지 반환
-  const getBackWaveLayerState1 = (props) => {
-    if (0 <= props && props <= 15) {
+  const getBackWaveLayerState1 = value => {
+    if (cal.boundaryPM25(value) === cnt.PM25_GOOD)
       return require('../../../../Assets/img/waveLayerGood1.png');
-    } else if (16 <= props && props <= 35) {
+    else if (cal.boundaryPM25(value) === cnt.PM25_MOD)
       return require('../../../../Assets/img/waveLayerModerate1.png');
-    } else if (36 <= props && props <= 75) {
+    else if (cal.boundaryPM25(value) === cnt.PM25_BAD)
       return require('../../../../Assets/img/waveLayerBad1.png');
-    } else {
+    else if (cal.boundaryPM25(value) === cnt.PM25_VERY_BAD)
       return require('../../../../Assets/img/waveLayerVeryBad1.png');
-    }
   };
 
   // Background Layer2의 color에 해당하는 이미지 반환
-  const getBackWaveLayerState2 = (props) => {
-    if (0 <= props && props <= 15) {
+  const getBackWaveLayerState2 = value => {
+    if (cal.boundaryPM25(value) === cnt.PM25_GOOD)
       return require('../../../../Assets/img/waveLayerGood2.png');
-    } else if (16 <= props && props <= 35) {
+    else if (cal.boundaryPM25(value) === cnt.PM25_MOD)
       return require('../../../../Assets/img/waveLayerModerate2.png');
-    } else if (36 <= props && props <= 75) {
+    else if (cal.boundaryPM25(value) === cnt.PM25_BAD)
       return require('../../../../Assets/img/waveLayerBad2.png');
-    } else {
+    else if (cal.boundaryPM25(value) === cnt.PM25_VERY_BAD)
       return require('../../../../Assets/img/waveLayerVeryBad2.png');
-    }
-  };
+  }
 
   // public Pm25의 color값 반환
-  const getPublicPm25TextColor = (props) => {
-    if (0 <= props && props <= 15) {
-      return {color: colors.azure};
-    } else if (16 <= props && props <= 35) {
-      return {color: colors.darkLimeGreen};
-    } else if (36 <= props && props <= 75) {
-      return {color: colors.lightOrange};
-    } else {
-      return {color: colors.coral};
-    }
+  const getPublicPm25TextColor = value => {
+    if (cal.boundaryPM25(value) === cnt.PM25_GOOD)
+      return { color: colors.azure };
+    else if (cal.boundaryPM25(value) === cnt.PM25_MOD)
+      return { color: colors.darkLimeGreen };
+    else if (cal.boundaryPM25(value) === cnt.PM25_BAD)
+      return { color: colors.lightOrange };
+    else if (cal.boundaryPM25(value) === cnt.PM25_VERY_BAD)
+      return { color: colors.coral };
   };
 
   // public Pm10의 color값 반환
@@ -269,42 +267,39 @@ export const Home = ({navigation}) => {
   }
 
   // Device의 Pm25 측정 값 상태 반환
-  const getHomeState = (props) => {
-    if (0 <= props && props <= 15) {
+  const getHomeState = value => {
+    if (cal.boundaryPM25(value) === cnt.PM25_GOOD)
       return strings.main_state_good;
-    } else if (16 <= props && props <= 35) {
+    else if (cal.boundaryPM25(value) === cnt.PM25_MOD)
       return strings.main_state_moderate;
-    } else if (36 <= props && props <= 75) {
+    else if (cal.boundaryPM25(value) === cnt.PM25_BAD)
       return strings.main_state_poor;
-    } else {
+    else if (cal.boundaryPM25(value) === cnt.PM25_VERY_BAD)
       return strings.main_state_verypoor;
-    }
   };
 
   // Device의 Pm25 측정 값에 해당하는 Device Background 이미지 반환
-  const getHomeSource = (props) => {
-    if (0 <= props && props <= 15) {
+  const getHomeSource = value => {
+    if (cal.boundaryPM25(value) === cnt.PM25_GOOD)
       return require('../../../../Assets/img/imgHouseBlue.png');
-    } else if (16 <= props && props <= 35) {
+    else if (cal.boundaryPM25(value) === cnt.PM25_MOD)
       return require('../../../../Assets/img/imgHouseGreen.png');
-    } else if (36 <= props && props <= 75) {
+    else if (cal.boundaryPM25(value) === cnt.PM25_BAD)
       return require('../../../../Assets/img/imgHouseOrange.png');
-    } else {
+    else if (cal.boundaryPM25(value) === cnt.PM25_VERY_BAD)
       return require('../../../../Assets/img/imgHouseRed.png');
-    }
   };
 
   // Device의 Pm25 측정 값에 해당하는 Picohome 이미지 반환
-  const getPicoHomeSource = (props) => {
-    if (0 <= props && props <= 15) {
+  const getPicoHomeSource = value => {
+    if (cal.boundaryPM25(value) === cnt.PM25_GOOD)
       return require('../../../../Assets/img/imgPicohomeGood.png');
-    } else if (16 <= props && props <= 35) {
+    else if (cal.boundaryPM25(value) === cnt.PM25_MOD)
       return require('../../../../Assets/img/imgPicohomeModerate.png');
-    } else if (36 <= props && props <= 75) {
+    else if (cal.boundaryPM25(value) === cnt.PM25_BAD)
       return require('../../../../Assets/img/imgPicohomeBad.png');
-    } else {
+    else if (cal.boundaryPM25(value) === cnt.PM25_VERY_BAD)
       return require('../../../../Assets/img/imgPicohomeVerybad.png');
-    }
   };
 
   // 현재 위치의 위도(latitude), 경도(longitude)값 설정
