@@ -1,12 +1,6 @@
-import React, {useState, useEffect, useContext} from 'react';
-import {
-  View,
-  Image,
-  StyleSheet,
-  ActivityIndicator,
-  Dimensions,
-} from 'react-native';
-import {createStackNavigator} from '@react-navigation/stack';
+import React, { useState, useEffect, useContext } from 'react';
+import { View, Image, StyleSheet, ActivityIndicator } from 'react-native';
+import { createStackNavigator } from '@react-navigation/stack';
 import {
   DeviceContext,
   DeviceAndAirInfoContext,
@@ -14,11 +8,13 @@ import {
   LanguageContext,
   OnlineContext,
 } from '../../../context';
-import {Home} from './Home';
-import {ViewAll} from './ViewAll';
+import { Home } from './Home';
+import { ViewAll } from './ViewAll';
 import database from '@react-native-firebase/database';
 import NetInfo from '@react-native-community/netinfo';
 import colors from '../../../src/colors';
+
+var co2=[], humid=[], pm10=[], pm25=[], temperature=[], tvoc=[];
 
 const RealTimeStack = createStackNavigator();
 export const RealTimeStackScreen = () => {
@@ -42,34 +38,69 @@ export const RealTimeStackScreen = () => {
   const [refresh, setRefresh] = useState(true);
 
   // RealtimeData를 호출
+  const getRealtimeAirInfo2 = (idx) => {
+
+    var date= new Date();
+    date.setSeconds(date.getSeconds()-10);
+    date= date.toISOString();
+    var start_time= date.substring(0,4)+date.substring(5,7)+date.substring(8,10)+date.substring(11,13)+date.substring(14,16)+date.substring(17,19);
+    var d = new Date();
+    var v = new Date();
+    v.setMinutes(d.getMinutes()+30);
+    v=v.toISOString();
+    var end_time= v.substring(0,4)+v.substring(5,7)+v.substring(8,10)+v.substring(11,13)+v.substring(14,16)+v.substring(17,19);
+
+      try {
+        fetch('http://mqtt.brilcom.com:8080/mqtt/GetAirQuality', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',//서버로 보낼 때 무엇으로 보내는 것인지 알려줌
+          },
+          body: JSON.stringify({
+
+            "serialNum" : devices[idx].SerialNum,
+            "startTime" : start_time,
+            "endTime"   : end_time,
+            "type" : "Co2,Humid,Pm10,Pm25,Temperature,Tvoc"
+          }),
+        })
+          .then((response) => response.json())
+          .then((res) => {
+
+            if (res.data.length>0) {
+              co2[idx]= res.data[0].Co2;
+              humid[idx]= res.data[0].Humid;
+              pm10[idx]= res.data[0].Pm10;
+              pm25[idx]= res.data[0].Pm25;
+              temperature[idx]= res.data[0].Temperature;
+              tvoc[idx]= res.data[0].Tvoc;
+            }
+          });
+      } catch (exception) {
+        console.log('ERROR :: ', exception);
+      }
+  };
+
   const getRealtimeAirInfo = (idx) => {
     let year = database().getServerTime().getFullYear();
     let month = leadingZeros(database().getServerTime().getMonth() + 1, 2);
     let day = leadingZeros(database().getServerTime().getUTCDate(), 2);
     let hour = leadingZeros(database().getServerTime().getUTCHours(), 2);
     let min = leadingZeros(database().getServerTime().getMinutes(), 2);
-    let sec = leadingZeros(
-      checkMinus(database().getServerTime().getSeconds() - 1),
-      2,
-    );
-    let uri =
-      '/devices/' +
-      devices[idx].SerialNum +
-      '/' +
-      year +
-      month +
-      day +
-      hour +
-      min +
-      sec;
+    let sec = leadingZeros(checkMinus(database().getServerTime().getSeconds() - 1), 2);
+    let uri = '/devices/' + devices[idx].SerialNum + '/' + year + month + day + hour + min + sec;
 
+    
     database()
       .ref(uri)
       .once('value')
       .then((snapshot) => {
         snapshotToArray(snapshot, idx);
       });
+      
   };
+
 
   // 전달받은 숫자가 음수이면 0으로 치환
   // RealtimeData 호출시 초가 0-2초 사이일 경우 음수로 가는 것을 방지
@@ -92,8 +123,12 @@ export const RealTimeStackScreen = () => {
   }
 
   // 데이터 오브젝트를 스트링으로 변환 후 deviceTempAirInfo에 push
+
+
+
   function snapshotToArray(snapshot, idx) {
-    let item = snapshot.val();
+    //let item = snapshot.val();
+    let item = {"value": "10050100050100f403017c0101a901000401"};
     let s = '000000000000000000000000000000000000';
     // 데이터 오브젝트를 불러오지 못했으면 s를 0으로 나열한 값으로 대체
     // 하지만 이건 이제 옜날 방법이다.
@@ -101,7 +136,6 @@ export const RealTimeStackScreen = () => {
     a.s = s;
     a.c = 5;
     if (item === null) {
-      console.log('null!');
       // item이 null이고 이전 snapshot이 있다면
       // 단순히 Realtime DB에서 정보를 load하지 못했거나
       // 기기가 어플 시작 후 중간에 꺼진 것
@@ -127,7 +161,7 @@ export const RealTimeStackScreen = () => {
     }
     // item이 null이 아니고 Realtime DB에서 값을 load했을 경우
     else {
-      console.log('Get realtime data success!');
+      //console.log('Get realtime data success!');
       // 현재 스냅샷에 불러온 값을 저장
       // count를 0으로 초기화
       a.s = item.value;
@@ -140,7 +174,7 @@ export const RealTimeStackScreen = () => {
   // 36자리 info data parsing
   const makeStat = (props) => {
     let stat = props.substring(0, 4);
-    let sum = 0;
+    let sum = 0;  
     let hex = 4096;
     for (let i = 0; i < 4; i++) {
       let c = stat.charAt(i);
@@ -153,9 +187,11 @@ export const RealTimeStackScreen = () => {
   // 등록된 Device들의 정보가 바뀌면 airInfo 새로 Load.
   // refresh값이 변경 될 경우 airInfo 새로 Load.
   useEffect(() => {
+
     if (devices.length != 0) {
       for (let i = 0; i < devices.length; i++) {
-        getRealtimeAirInfo(i);
+        getRealtimeAirInfo2(i);
+        getRealtimeAirInfo(i);     
       }
     } else {
       setDeviceAndAirInfo([]);
@@ -165,13 +201,15 @@ export const RealTimeStackScreen = () => {
       setAirInfoState(deviceTempAirInfo);
       setDeviceSnapAndCount(deviceTempSnapAndCount);
     }, 1000);
+
   }, [devices, refresh]);
 
   // 3초 마다 한번씩 refresh값 변경 realtime database에 접근
   useEffect(() => {
+
     let time10 = setInterval(() => {
       NetInfo.fetch().then((state) => {
-        console.log('Is connected?', state.isConnected);
+
         if (!state.isConnected) {
           setIsOnline(false);
         } else {
@@ -188,13 +226,11 @@ export const RealTimeStackScreen = () => {
   // airInfoState가 변경될 경우 해당 정보를 토대로 새로운 airInfo를 생성.
   useEffect(() => {
     // 여기도 처리를 이렇게 해야할까?
+    //console.log("airInfoState"+airInfoState);
     if (airInfoState.length != 0) {
       if (devices.length != 0) {
         // 이걸 이렇게 바인딩 시켜야 하나ㅠ
-        if (
-          airInfoState.length === devices.length &&
-          deviceSnapAndCount.length === devices.length
-        ) {
+        if (airInfoState.length === devices.length && deviceSnapAndCount.length === devices.length) {
           for (let i = 0; i < devices.length; i++) {
             let a = new Object();
             a.Id = i;
@@ -205,12 +241,12 @@ export const RealTimeStackScreen = () => {
             a.SerialNum = devices[i].SerialNum;
 
             let stateInfo = new Object();
-            stateInfo.pm25 = makeStat(airInfoState[i].substring(0, 6));
-            stateInfo.pm10 = makeStat(airInfoState[i].substring(6, 12));
-            stateInfo.temp = makeStat(airInfoState[i].substring(12, 18));
-            stateInfo.humd = makeStat(airInfoState[i].substring(18, 24));
-            stateInfo.co2 = makeStat(airInfoState[i].substring(24, 30));
-            stateInfo.vocs = makeStat(airInfoState[i].substring(30, 36));
+            stateInfo.pm25 = parseInt(pm25[i]);
+            stateInfo.pm10 = parseInt(pm10[i]);
+            stateInfo.temp = parseInt(temperature[i]);
+            stateInfo.humd = parseInt(humid[i]);
+            stateInfo.co2 =  parseInt(co2[i]);
+            stateInfo.vocs = parseInt(tvoc[i]);
             a.stateInfo = stateInfo;
 
             deviceAirInfo.push(a);
@@ -240,9 +276,6 @@ export const RealTimeStackScreen = () => {
                 name="Home"
                 component={Home}
                 options={{
-                  headerBackTitleStyle: {
-                    color: 'transparent',
-                  },
                   headerShown: false,
                 }}
               />
@@ -254,19 +287,9 @@ export const RealTimeStackScreen = () => {
                   headerTransparent: true,
                   headerTitleAlign: 'center',
                   headerTitleStyle: {
-                    fontFamily: 'NotoSans',
-                    fontWeight: '800',
-                    fontStyle: 'normal',
+                    fontFamily: 'NotoSans-Bold',
                   },
-                  headerBackTitleStyle: {
-                    color: 'transparent',
-                  },
-                  headerBackImage: () => (
-                    <Image
-                      style={{marginLeft: width * 0.05}}
-                      source={require('../../../../Assets/img/icArrowLeft.png')}
-                    />
-                  ),
+                  headerBackImage: () => <Image source={require('../../../../Assets/img/icArrowLeft.png')} />,
                 }}
               />
             </RealTimeStack.Navigator>
@@ -280,8 +303,6 @@ export const RealTimeStackScreen = () => {
     </DeviceAndAirInfoContext.Provider>
   );
 };
-
-const {width} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   indicator: {
