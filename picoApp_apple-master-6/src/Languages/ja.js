@@ -40,7 +40,9 @@ export default {
   signup_input_password: 'パスワード',
   signup_label_reenterpassword: 'パスワードの確認',
   signup_input_reenterpassword: 'パスワードの確認',
-  signup_terms: 'ピコホームの利用規約と個人情報保護方針に同意します。',
+  signup_terms_head: 'ピコホームの',
+  signup_terms: '利用規約と個人情報保護方針',
+  signup_terms_tail: 'に同意します。',
   signup_button_next: '次へ',
   signup_error_email: '正確なメールアドレスを入力してください。',
   signup_error_password:

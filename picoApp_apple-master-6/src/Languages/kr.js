@@ -38,7 +38,9 @@ export default {
   signup_input_password: '비밀번호',
   signup_label_reenterpassword: '비밀번호 확인',
   signup_input_reenterpassword: '비밀번호 확인',
-  signup_terms: '피코홈의 이용약관과 개인정보취급방침에 동의합니다.',
+  signup_terms_head: '피코홈의 ',
+  signup_terms: '이용약관과 개인정보취급방침',
+  signup_terms_tail: '에 동의합니다.',
   signup_button_next: '다음',
   signup_error_email: '정확한 이메일 주소를 입력해 주세요',
   signup_error_password:

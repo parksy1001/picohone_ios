@@ -38,7 +38,9 @@ export default {
   signup_input_password: 'Password',
   signup_label_reenterpassword: 'Re-enter Password',
   signup_input_reenterpassword: 'Re-enter Password',
-  signup_terms: 'I agree to PiCOHOME’s Privacy poicy and Terms of Usage',
+  signup_terms_head: 'I agree to PiCOHOME’s ',
+  signup_terms: 'Privacy poicy and Terms of Usage',
+  signup_terms_tail: '',
   signup_button_next: 'NEXT',
   signup_error_email: 'Please enter a valid email',
   signup_error_password:

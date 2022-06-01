@@ -249,9 +249,11 @@ export const SignUp1 = ({navigation}) => {
                 ) : (
                   <Image source={require('../../Assets/img/deactive.png')} />
                 )}
-                <Text style={styles.iAgreeAllStatemen}>
-                  {strings.signup_terms}
-                </Text>
+                <Text style={styles.iAgreeAllStatemen}>{strings.signup_terms_head}</Text>
+                <TouchableOpacity onPress={() => navigation.navigate('WebView', 'terms')}>
+                  <Text style={styles.agreeTerm}>{strings.signup_terms}</Text>
+                </TouchableOpacity>
+                <Text style={[styles.iAgreeAllStatemen, {marginLeft: 0}]}>{strings.signup_terms_tail}</Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -411,6 +413,12 @@ const styles = StyleSheet.create({
     fontFamily: 'NotoSans',
     fontSize: 11,
     color: colors.brownGrey,
+  },
+  agreeTerm: {
+    fontFamily: 'NotoSans',
+    fontSize: 11,
+    color: colors.deepSkyBlue,
+    textDecorationLine: 'underline',
   },
   buttonView: {position: 'absolute', top: height * 0.74},
   buttonStyle: {
