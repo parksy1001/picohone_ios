@@ -1,14 +1,5 @@
-import React, {useState, useContext, useEffect} from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  Image,
-  Dimensions,
-  ActivityIndicator,
-  FlatList,
-  TouchableOpacity,
-} from 'react-native';
+import React, { useState, useContext, useEffect } from 'react';
+import { StyleSheet, View, Text, Image, Dimensions, ActivityIndicator, FlatList, TouchableOpacity } from 'react-native';
 import {
   DeviceAndAirInfoContext,
   SettingContext,
@@ -20,9 +11,11 @@ import {
 } from '../../../context';
 import Modal from 'react-native-modal';
 import colors from '../../../src/colors';
+import cal from '../../../src/calculate';
+import cnt from '../../../src/constant';
 
-export const ViewAll = ({navigation}) => {
-  const {getDeviceState} = useContext(SettingContext);
+export const ViewAll = ({ navigation }) => {
+  const { getDeviceState } = useContext(SettingContext);
   const strings = useContext(LanguageContext);
   const isOnline = useContext(OnlineContext);
   const userInfo = useContext(UserContext);
@@ -43,6 +36,7 @@ export const ViewAll = ({navigation}) => {
   const [Mod, setMod] = useState(0);
   const [Bad, setBad] = useState(0);
   const [VeryBad, setVeryBad] = useState(0);
+  const [Empty, setEmpty] = useState(0);
 
   const [isDelete, setDelete] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
@@ -72,17 +66,17 @@ export const ViewAll = ({navigation}) => {
       .then((response) => response.json())
       .then((res) => {
         if (res.Msg === 'success') {
-          console.log('Remove Success!');
+          //========console.log('Remove Success!');
           getDeviceState(userInfo.userid, userInfo.apiKey);
           setTimeout(() => {
             setIsLoading(true);
           }, 3000);
         } else {
-          console.log(res.Msg);
+          //====console.log(res.Msg);
         }
       })
       .catch((error) => {
-        console.error(error);
+        //====console.error(error);
       });
     toggleDelete();
   };
@@ -92,77 +86,72 @@ export const ViewAll = ({navigation}) => {
     let mod = 0;
     let bad = 0;
     let vbad = 0;
+    let empty = 0
+
     for (let i = 0; i < len; i++) {
-      if (snapShotAndCount.length != 0 && snapShotAndCount[i].c >= 5) {
+      if (snapShotAndCount.length !== 0 && snapShotAndCount[i].c >= 5) {
         continue;
       } else {
-        if (
-          0 <= deviceAndAirInfo[i].stateInfo.pm25 &&
-          deviceAndAirInfo[i].stateInfo.pm25 <= 15
-        ) {
-          good = good + 1;
-        } else if (
-          16 <= deviceAndAirInfo[i].stateInfo.pm25 &&
-          deviceAndAirInfo[i].stateInfo.pm25 <= 35
-        ) {
-          mod = mod + 1;
-        } else if (
-          36 <= deviceAndAirInfo[i].stateInfo.pm25 &&
-          deviceAndAirInfo[i].stateInfo.pm25 <= 75
-        ) {
-          bad = bad + 1;
-        } else {
-          vbad = vbad + 1;
-        }
+        if (cal.boundaryPM25(deviceAndAirInfo[i].stateInfo.pm25) === cnt.PM25_GOOD)
+          good++
+        else if (cal.boundaryPM25(deviceAndAirInfo[i].stateInfo.pm25) === cnt.PM25_MOD)
+          mod++
+        else if (cal.boundaryPM25(deviceAndAirInfo[i].stateInfo.pm25) === cnt.PM25_BAD)
+          bad++
+        else if (cal.boundaryPM25(deviceAndAirInfo[i].stateInfo.pm25) === cnt.PM25_VERY_BAD)
+          vbad++
+        else if (cal.boundaryPM25(deviceAndAirInfo[i].stateInfo.pm25) === cnt.PM25_EMPTY)
+          empty++
       }
     }
     setGood(good);
     setMod(mod);
     setBad(bad);
     setVeryBad(vbad);
+    setEmpty(empty)
   };
 
-  const getDeviceStateColor = (props) => {
-    if (0 <= props && props <= 15) {
-      DeviceStateColor = goodState.bgColor;
-    } else if (16 <= props && props <= 35) {
-      DeviceStateColor = modState.bgColor;
-    } else if (36 <= props && props <= 75) {
-      DeviceStateColor = badState.bgColor;
-    } else {
-      DeviceStateColor = veryBadState.bgColor;
-    }
-    return DeviceStateColor;
+  const getDeviceStateColor = value => {
+    if (cal.boundaryPM25(value) === cnt.PM25_GOOD)
+      return goodState.bgColor
+    else if (cal.boundaryPM25(value) === cnt.PM25_MOD)
+      return modState.bgColor
+    else if (cal.boundaryPM25(value) === cnt.PM25_BAD)
+      return badState.bgColor
+    else if (cal.boundaryPM25(value) === cnt.PM25_VERY_BAD)
+      return veryBadState.bgColor
+    else
+      return emptyState.bgColor
   };
 
-  const getDeviceTextPlaceColor = (props) => {
-    if (0 <= props && props <= 15) {
-      DeviceTextPlaceColor = goodState.txtPlaceColor;
-    } else if (16 <= props && props <= 35) {
-      DeviceTextPlaceColor = modState.txtPlaceColor;
-    } else if (36 <= props && props <= 75) {
-      DeviceTextPlaceColor = badState.txtPlaceColor;
-    } else {
-      DeviceTextPlaceColor = veryBadState.txtPlaceColor;
-    }
-    return DeviceTextPlaceColor;
+  const getDeviceTextPlaceColor = value => {
+    if (cal.boundaryPM25(value) === cnt.PM25_GOOD)
+      return goodState.txtPlaceColor
+    else if (cal.boundaryPM25(value) === cnt.PM25_MOD)
+      return modState.txtPlaceColor
+    else if (cal.boundaryPM25(value) === cnt.PM25_BAD)
+      return badState.txtPlaceColor
+    else if (cal.boundaryPM25(value) === cnt.PM25_VERY_BAD)
+      return veryBadState.txtPlaceColor
+    else
+      return emptyState.txtPlaceColor
   };
 
-  const getDeviceTextPicoColor = (props) => {
-    if (0 <= props && props <= 15) {
-      DeviceTextPicoColor = goodState.txtpiCo;
-    } else if (16 <= props && props <= 35) {
-      DeviceTextPicoColor = modState.txtpiCo;
-    } else if (36 <= props && props <= 75) {
-      DeviceTextPicoColor = badState.txtpiCo;
-    } else {
-      DeviceTextPicoColor = veryBadState.txtpiCo;
-    }
-    return DeviceTextPicoColor;
+  const getDeviceTextPicoColor = value => {
+    if (cal.boundaryPM25(value) === cnt.PM25_GOOD)
+      return goodState.txtpiCo
+    else if (cal.boundaryPM25(value) === cnt.PM25_MOD)
+      return modState.txtpiCo
+    else if (cal.boundaryPM25(value) === cnt.PM25_BAD)
+      return badState.txtpiCo
+    else if (cal.boundaryPM25(value) === cnt.PM25_VERY_BAD)
+      return veryBadState.txtpiCo
+    else
+      return emptyState.txtpiCo
   };
 
   useEffect(() => {
-    if (deviceAndAirInfo.length != 0) {
+    if (deviceAndAirInfo.length !== 0) {
       getDeviceNum(deviceAndAirInfo.length);
     } else {
       getDeviceNum(0);
@@ -172,24 +161,16 @@ export const ViewAll = ({navigation}) => {
   return (
     <View style={styles.container}>
       {isLoading ? (
-        <View style={{alignItems: 'center'}}>
+        <View style={{ alignItems: 'center' }}>
           <View style={styles.deleteViewStyle}>
-            <View></View>
+            <View/>
             {isDelete ? (
-              <TouchableOpacity
-                style={styles.deleteButton}
-                onPress={() => toggleDelete()}>
-                <Image
-                  source={require('../../../../Assets/img/icDeleteOff.png')}
-                />
+              <TouchableOpacity style={styles.deleteButton} onPress={() => toggleDelete()}>
+                <Image source={require('../../../../Assets/img/icDeleteOff.png')} />
               </TouchableOpacity>
             ) : (
-              <TouchableOpacity
-                style={styles.deleteButton}
-                onPress={() => toggleDelete()}>
-                <Image
-                  source={require('../../../../Assets/img/icDeleteOn.png')}
-                />
+              <TouchableOpacity style={styles.deleteButton} onPress={() => toggleDelete()}>
+                <Image source={require('../../../../Assets/img/icDeleteOn.png')} />
               </TouchableOpacity>
             )}
           </View>
@@ -197,57 +178,55 @@ export const ViewAll = ({navigation}) => {
             <Text style={styles.pm25Text}>PM2.5</Text>
             <View style={styles.deviceNumberView}>
               <View style={styles.deviceNumberBox}>
-                <View style={goodState.indicator}></View>
+                <View style={goodState.indicator}/>
                 <Text style={goodState.text}>{Good}</Text>
               </View>
               <View style={styles.deviceNumberBox}>
-                <View style={modState.indicator}></View>
+                <View style={modState.indicator}/>
                 <Text style={modState.text}>{Mod}</Text>
               </View>
               <View style={styles.deviceNumberBox}>
-                <View style={badState.indicator}></View>
+                <View style={badState.indicator}/>
                 <Text style={badState.text}>{Bad}</Text>
               </View>
               <View style={styles.deviceNumberBox}>
-                <View style={veryBadState.indicator}></View>
+                <View style={veryBadState.indicator}/>
                 <Text style={veryBadState.text}>{VeryBad}</Text>
+              </View>
+              <View style={styles.deviceNumberBox}>
+                <View style={emptyState.indicator}/>
+                <Text style={emptyState.text}>{Empty}</Text>
               </View>
             </View>
           </View>
           <View style={styles.flatListView}>
-            {devices.length != 0 && deviceAndAirInfo.length != 0 ? (
+            {devices.length !== 0 && deviceAndAirInfo.length !== 0 ? (
               <FlatList
                 numColumns={numColumns}
                 data={deviceAndAirInfo}
                 keyExtractor={(item) => item.Id}
-                renderItem={({item, index}) => (
+                renderItem={({ item, index }) => (
                   <View key={index}>
                     {snapShotAndCount.length === deviceAndAirInfo.length ? (
                       snapShotAndCount[index].c >= 5 ? (
                         <View>
                           <View style={styles.deviceBgWhite}>
-                            <View style={styles.bgColor}></View>
-                            <View style={{alignItems: 'center'}}>
+                            <View style={styles.bgColor}/>
+                            <View style={{ alignItems: 'center' }}>
                               <View style={styles.devicePlace}>
-                                <Text style={styles.txtPlaceColor}>
-                                  {item.Description}
-                                </Text>
+                                <Text style={styles.txtPlaceColor}>{item.Description}</Text>
                               </View>
-                              <Text style={styles.txtpiCo}>
-                                {item.PicoName}
-                              </Text>
+                              <Text style={styles.txtpiCo}>{item.PicoName}</Text>
                             </View>
                           </View>
                           {isDelete ? (
                             <View style={styles.deviceDeleteButton}>
                               <TouchableOpacity
                                 onPress={() => {
-                                  setDeleteTarget(item.Id),
-                                    setDeleteModal(true);
+                                  setDeleteTarget(item.Id)
+                                  setDeleteModal(true);
                                 }}>
-                                <Image
-                                  source={require('../../../../Assets/img/icDeletePicohome.png')}
-                                />
+                                <Image source={require('../../../../Assets/img/icDeletePicohome.png')} />
                               </TouchableOpacity>
                             </View>
                           ) : null}
@@ -264,25 +243,12 @@ export const ViewAll = ({navigation}) => {
                               })
                             }>
                             <View style={styles.deviceBgWhite}>
-                              <View
-                                style={getDeviceStateColor(
-                                  item.stateInfo.pm25,
-                                )}></View>
-                              <View style={{alignItems: 'center'}}>
+                              <View style={getDeviceStateColor(item.stateInfo.pm25)}/>
+                              <View style={{ alignItems: 'center' }}>
                                 <View style={styles.devicePlace}>
-                                  <Text
-                                    style={getDeviceTextPlaceColor(
-                                      item.stateInfo.pm25,
-                                    )}>
-                                    {item.Description}
-                                  </Text>
+                                  <Text style={getDeviceTextPlaceColor(item.stateInfo.pm25)}>{item.Description}</Text>
                                 </View>
-                                <Text
-                                  style={getDeviceTextPicoColor(
-                                    item.stateInfo.pm25,
-                                  )}>
-                                  {item.PicoName}
-                                </Text>
+                                <Text style={getDeviceTextPicoColor(item.stateInfo.pm25)}>{item.PicoName}</Text>
                               </View>
                             </View>
                           </TouchableOpacity>
@@ -290,12 +256,10 @@ export const ViewAll = ({navigation}) => {
                             <View style={styles.deviceDeleteButton}>
                               <TouchableOpacity
                                 onPress={() => {
-                                  setDeleteTarget(item.Id),
-                                    setDeleteModal(true);
+                                  setDeleteTarget(item.Id)
+                                  setDeleteModal(true);
                                 }}>
-                                <Image
-                                  source={require('../../../../Assets/img/icDeletePicohome.png')}
-                                />
+                                <Image source={require('../../../../Assets/img/icDeletePicohome.png')} />
                               </TouchableOpacity>
                             </View>
                           ) : null}
@@ -304,54 +268,32 @@ export const ViewAll = ({navigation}) => {
                     ) : (
                       <View style={styles.deviceBgWhite}>
                         <View style={styles.indicator}>
-                          <ActivityIndicator
-                            size="large"
-                            color={colors.azure}
-                          />
+                          <ActivityIndicator size="large" color={colors.azure} />
                         </View>
                       </View>
                     )}
-                    <Modal
-                      isVisible={deleteModal}
-                      onBackdropPress={() => setDeleteModal(false)}>
+                    <Modal isVisible={deleteModal} onBackdropPress={() => setDeleteModal(false)}>
                       <View style={styles.modalContainer}>
                         <View style={styles.modalCancel}>
-                          <TouchableOpacity
-                            onPress={() => setDeleteModal(false)}>
-                            <Image
-                              source={require('../../../../Assets/img/icCancel.png')}
-                            />
+                          <TouchableOpacity onPress={() => setDeleteModal(false)}>
+                            <Image source={require('../../../../Assets/img/icCancel.png')} />
                           </TouchableOpacity>
                         </View>
                         <View style={styles.modalHeaderTextView}>
-                          <Text style={styles.modalHeaderText}>
-                            {strings.viewall_popup_title}
-                          </Text>
+                          <Text style={styles.modalHeaderText}>{strings.viewall_popup_title}</Text>
                         </View>
                         <View style={styles.modalSubTextView}>
-                          <Text style={styles.modalSubText}>
-                            {strings.viewall_popup_contents}
-                          </Text>
+                          <Text style={styles.modalSubText}>{strings.viewall_popup_contents}</Text>
                         </View>
-                        <View style={{flexDirection: 'row'}}>
-                          <TouchableOpacity
-                            onPress={() => removeDevice(deleteTarget)}>
-                            <View
-                              style={[
-                                styles.modalButton,
-                                {backgroundColor: colors.veryLightPink},
-                              ]}>
-                              <Text style={styles.modalButtonText}>
-                                {strings.viewall_popup_button_delete}
-                              </Text>
+                        <View style={{ flexDirection: 'row' }}>
+                          <TouchableOpacity onPress={() => removeDevice(deleteTarget)}>
+                            <View style={[styles.modalButton, { backgroundColor: colors.veryLightPink }]}>
+                              <Text style={styles.modalButtonText}>{strings.viewall_popup_button_delete}</Text>
                             </View>
                           </TouchableOpacity>
-                          <TouchableOpacity
-                            onPress={() => setDeleteModal(false)}>
+                          <TouchableOpacity onPress={() => setDeleteModal(false)}>
                             <View style={styles.modalButton}>
-                              <Text style={styles.modalButtonText}>
-                                {strings.viewall_popup_button_cancel}
-                              </Text>
+                              <Text style={styles.modalButtonText}>{strings.viewall_popup_button_cancel}</Text>
                             </View>
                           </TouchableOpacity>
                         </View>
@@ -361,10 +303,8 @@ export const ViewAll = ({navigation}) => {
                 )}
               />
             ) : (
-              <View style={{alignItems: 'center'}}>
-                <Text style={{color: colors.azure}}>
-                  {strings.viewall_label_empty}
-                </Text>
+              <View style={{ alignItems: 'center' }}>
+                <Text style={{ color: colors.azure }}>{strings.viewall_label_empty}</Text>
               </View>
             )}
           </View>
@@ -378,7 +318,7 @@ export const ViewAll = ({navigation}) => {
   );
 };
 
-const {width, height} = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {
@@ -393,21 +333,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  deleteButton: {margin: width * 0.05, marginTop: height * 0.1},
-  deviceNumberByPm25: {marginTop: height * 0.0423, alignItems: 'center'},
+  deleteButton: { margin: width * 0.05, marginTop: height * 0.1 },
+  deviceNumberByPm25: { marginTop: height * 0.0423, alignItems: 'center' },
   pm25Text: {
     textAlign: 'center',
     fontFamily: 'NotoSans',
     fontSize: 12,
     color: colors.greyishBrown,
   },
-  deviceNumberView: {flexDirection: 'row'},
+  deviceNumberView: { flexDirection: 'row' },
   deviceNumberBox: {
     margin: width * 0.03125,
     alignItems: 'center',
     flexDirection: 'row',
   },
-  flatListView: {marginTop: height * 0.04},
+  flatListView: { marginTop: height * 0.04 },
   deviceBgWhite: {
     flexDirection: 'column',
     width: width * 0.281,
@@ -438,17 +378,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  txtPlaceColor: {
-    textAlign: 'center',
-    fontFamily: 'NotoSans',
-    fontSize: 13,
-    color: colors.brownGrey,
-  },
-  txtpiCo: {
-    fontFamily: 'NotoSans',
-    fontSize: 11,
-    color: colors.brownGrey,
-  },
+  txtPlaceColor: { textAlign: 'center', fontFamily: 'NotoSans', fontSize: 13, color: colors.brownGrey },
+  txtpiCo: { fontFamily: 'NotoSans', fontSize: 11, color: colors.brownGrey },
   deviceDeleteButton: {
     position: 'absolute',
   },
@@ -461,18 +392,18 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: colors.white,
   },
-  modalCancel: {position: 'absolute', top: 12, right: 12},
+  modalCancel: { position: 'absolute', top: 12, right: 12 },
   modalHeaderTextView: {
     width: width * 0.9,
     alignItems: 'center',
   },
-  modalHeaderText: {fontSize: 22, fontFamily: 'NotoSans'},
+  modalHeaderText: { fontSize: 22, fontFamily: 'NotoSans' },
   modalSubTextView: {
     width: width * 0.75,
     marginTop: height * 0.0281,
     alignItems: 'center',
   },
-  modalSubText: {fontSize: 16, color: colors.brownGrey, textAlign: 'center'},
+  modalSubText: { fontSize: 16, color: colors.brownGrey, textAlign: 'center' },
   modalButton: {
     width: width * 0.3875,
     height: height * 0.0704,
@@ -660,5 +591,45 @@ const veryBadState = StyleSheet.create({
     fontFamily: 'NotoSans',
     fontSize: 11,
     color: colors.coral,
+  },
+});
+
+const emptyState = StyleSheet.create({
+  indicator: {
+    margin: 2,
+    width: 8,
+    height: 8,
+    backgroundColor: colors.brownGrey,
+  },
+  text: {
+    margin: 2,
+    fontFamily: 'NotoSans',
+    fontSize: 16,
+  },
+  bgColor: {
+    width: width * 0.281,
+    height: height * 0.0211,
+    borderTopLeftRadius: 4,
+    borderTopRightRadius: 4,
+    backgroundColor: colors.brownGrey,
+    shadowColor: 'rgba(252, 83, 69, 0.2)',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowRadius: 16,
+    shadowOpacity: 1,
+    elevation: 1,
+  },
+  txtPlaceColor: {
+    textAlign: 'center',
+    fontFamily: 'NotoSans',
+    fontSize: 13,
+    color: colors.brownishGrey,
+  },
+  txtpiCo: {
+    fontFamily: 'NotoSans',
+    fontSize: 11,
+    color: colors.brownishGrey,
   },
 });
