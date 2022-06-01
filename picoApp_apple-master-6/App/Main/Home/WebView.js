@@ -7,7 +7,7 @@ export const WebViewScreen = ({ route }) => {
   const getWebUri = (props) => {
     console.log(props);
     if (props === 'amazon') {
-      return 'https://www.amazon.com/gp/product/B084BZW1KH';
+      return 'https://www.brilcom.com/%ED%94%BC%EC%BD%94%ED%99%88';
     } else if (props === 'terms') {
       return 'https://www.brilcom.com/%EA%B0%9C%EC%9D%B8%EC%A0%95%EB%B3%B4-%EC%95%BD%EA%B4%80';
     } else if (props === 'faq') {
