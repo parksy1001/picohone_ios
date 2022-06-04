@@ -207,7 +207,7 @@ export const StateTabScreen = () => {
         </View>
 
         {isLoading ? (
-          <ComfortZone temp={temp} humd={humd} />
+          <ComfortZone temp={temp || 0} humd={humd || 0} />
         ) : (
           <View style={styles.indicator}>
             <ActivityIndicator size="large" color={colors.azure} />
