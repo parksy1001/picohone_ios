@@ -300,4 +300,9 @@ export default {
     'ピコホームをスキャンするために、モバイル機器でBluetooth機能をオンにしてください。', // 'ピコホームのアプリがブルートゥースの使用許可を求めています。',
   ble_permission_popup_button_allow: '許可',
   ble_permission_popup_button_deny: '許可しない',
+  wifi_publicwifi_connect:'連結',
+  popup_firmwareupdate_title: 'ファームウェアアップデート',
+  popup_firmwareupdate_contents: '新しいバージョンのソフトウェアがあります。より快適な使用のためにアップデートをしてください。\n\n1。ピコホームの電源を切ってから、もう一度電源を入れてください。\n\n2。 ピコホームが紫色のランプ点灯時は、アップデート中です。少々お待ちください。\n\n3。機器の電源が自動的に切られたら、電源ボタンを軽く押してピコホームの電源を入れてください。',
+  devicesetting_firmware_vesion_latest: '最新バージョン',
+  devicesetting_firmware_vesion_update: 'アップデート',
 };

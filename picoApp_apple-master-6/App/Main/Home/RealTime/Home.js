@@ -22,6 +22,7 @@ import {
   OnlineContext,
   LocaleContext,
 } from '../../../context';
+import useCheckFirmwareVersion from '../../../src/hook/useCheckFirmwareVersion';
 import LinearGradient from 'react-native-linear-gradient';
 import BitSwiper from 'react-native-bit-swiper';
 import Geolocation from '@react-native-community/geolocation';
@@ -65,9 +66,28 @@ export const Home = ({navigation}) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [pollenExplain, setPollenEx] = useState(false);
+  const [isFirmwareUpdate, setIsFirmwareUpdate] = useState(false);
   const [isOffLine, setIsOffLine] = useState(false);
   const [isForcedLogout, setIsForcedLogout] = useState(false);
   
+  const [getLatestFirmwareVersion, getDeviceFirmwareVersion] = useCheckFirmwareVersion()
+
+  const compareFirmwareVersion = async (id) => {
+    const latestVersion = await getLatestFirmwareVersion(id)
+    const verson = await getDeviceFirmwareVersion(id)
+
+    return ((latestVersion > verson) || (latestVersion < verson))
+  }
+  const isShowFirmwareUpdate = async () => {
+    let isLatestVersion = true
+
+    await Promise.all(devices.map(async (_, id) => {
+      isLatestVersion = await compareFirmwareVersion(id)
+    }))
+    
+    setIsFirmwareUpdate(!isLatestVersion)
+  }
+
   function open_WhatsApp() {
  
     Linking.openURL("https://apps.apple.com/kr/app/picohome/id1330540218");
@@ -309,6 +329,8 @@ export const Home = ({navigation}) => {
   // 현재 위치의 위도(latitude), 경도(longitude)값 설정
   // 현재 위치의 위,경도를 기준으로 Temperature/Humid/Ozone 설정
   useEffect(() => {
+    isShowFirmwareUpdate()
+
     Geolocation.getCurrentPosition((position) => {
       setLatitude(position.coords.latitude);
       setLongitude(position.coords.longitude);
@@ -729,7 +751,8 @@ export const Home = ({navigation}) => {
                   onItemRender={(item, index) => (
                     <View key={index} style={styles.swiperBox}>
                       {snapShotAndCount.length === deviceAndAirInfo.length ? (
-                        snapShotAndCount[index].c >= 5 ? (
+                        // snapShotAndCount[index].c >= 5 ? (
+                        isNaN(item.stateInfo.co2) ? (
                           <View>
                             <ImageBackground
                               source={require('../../../../Assets/img/imgHouseBgShadow.png')}
@@ -994,6 +1017,27 @@ export const Home = ({navigation}) => {
           <TouchableOpacity onPress={()=>open_WhatsApp()}>
             <View style={[styles.modalButton, { width: width * 0.8 }]}>
               <Text style={styles.modalButtonText}>{strings.main_popup_button}</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
+      <Modal isVisible={isFirmwareUpdate} onBackdropPress={() => setIsFirmwareUpdate(false)}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalCancel}>
+            <TouchableOpacity onPress={() => setIsFirmwareUpdate(false)}>
+              <Image source={require('../../../../Assets/img/icCancel.png')} />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.modalHeaderTextView}>
+            <Text style={styles.modalHeaderText}>{strings.popup_firmwareupdate_title}</Text>
+          </View>
+          <View style={styles.modalSubTextView}>
+            <Text style={styles.modalSubTextNotCenter}>{strings.popup_firmwareupdate_contents}</Text>
+          </View>
+          <TouchableOpacity onPress={() => setIsFirmwareUpdate(false)}>
+            <View style={[styles.modalButton, { width: width * 0.8 }]}>
+              <Text style={styles.modalButtonText}>{strings.main_popup_pollen_button_ok}</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -1315,6 +1359,11 @@ const styles = StyleSheet.create({
     fontWeight: 'normal',
     fontStyle: 'normal',
     fontSize: 14,
+    color: colors.brownGrey,
+  },
+  modalSubTextNotCenter: {
+    fontFamily: 'NotoSans',
+    fontSize: 13,
     color: colors.brownGrey,
   },
   modalButton: {

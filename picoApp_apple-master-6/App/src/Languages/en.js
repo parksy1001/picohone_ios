@@ -298,4 +298,9 @@ export default {
     'Please turn on Bluetooth function on your mobile device first to scan PiCOHOME.', // 'PiCOHOME is requesting to turn on bluetooth.',
   ble_permission_popup_button_allow: 'ALLOW',
   ble_permission_popup_button_deny: 'DENY',
+  wifi_publicwifi_connect:'Connect',
+  popup_firmwareupdate_title: 'Firmware Update',
+  popup_firmwareupdate_contents: 'A new firmware is available. Please update to enable a better service.\n\n1. Please turn off the PiCOHOME and turn it on again.\n\n2. If you can see the red purple light of PiCOHOME, please wait until the device is updated.\n\n3.  After the device is turned off automatically, please press the power button lightly and turn on your PiCOHOME.',
+  devicesetting_firmware_vesion_latest: 'Latest version',
+  devicesetting_firmware_vesion_update: 'Update',
 };

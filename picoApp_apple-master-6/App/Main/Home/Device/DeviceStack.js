@@ -35,30 +35,6 @@ export const DeviceStackScreen = ({navigation, route}) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    
-    fetch('https://us-central1-pico-home.cloudfunctions.net/GetLatestFirmware', {
-
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        serialNum : device[id].SerialNum
-      }),
-    })
-      .then((res)=> res.text())
-      .then((res) => {
-        //console.log(res);
-        device[id].FirmwareVersion = res.substring(2,4)+"."+res.substring(4,6)+"."+res.substring(6,8);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-
-  }, []);
-
-  useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 1000);

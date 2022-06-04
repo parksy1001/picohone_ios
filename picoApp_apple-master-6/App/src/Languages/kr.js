@@ -296,4 +296,9 @@ export default {
   //'피코홈앱에서 블루투스 기능을 켤 수 있도록\n허용할까요?',
   ble_permission_popup_button_allow: '허용',
   ble_permission_popup_button_deny: '허용 안 함',
+  wifi_publicwifi_connect:'연결하기',
+  popup_firmwareupdate_title: '펌웨어 업데이트',
+  popup_firmwareupdate_contents: '새로운 버전의 펌웨어가 있습니다. 더 나은 서비스를 위하여 피코홈 기기의 펌웨어 업데이트를 해주세요.\n\n1. 피코홈의 전원을 껐다가 다시 켜주세요.\n\n2. 피코홈에서 자주색 불빛이 보인다면, 업데이트 중이니 기다려주세요.\n\n3. 기기가 자동으로 꺼지면, 다시 전원을 살짝 눌러 피코홈을 켜주세요.',
+  devicesetting_firmware_vesion_latest: '최신버전',
+  devicesetting_firmware_vesion_update: '업데이트',
 };
