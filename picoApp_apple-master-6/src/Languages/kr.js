@@ -181,7 +181,7 @@ export default {
   details_graph_label_humidity: '습도',
   details_graph_label_vocs: '휘발성유기화합물',
   details_graph_label_co2: '이산화탄소',
-  details_subtitle_comfortzone: 'Comfont Zone',
+  details_subtitle_comfortzone: 'Comfort Zone',
   detail_tip_info_label_pm25: '초미세먼지',
   detail_tip_info_level_pm25_1: '0 - 15 : 좋음 / 하늘색',
   detail_tip_info_level_pm25_2: '16 - 35 : 보통 / 초록색',

@@ -181,7 +181,7 @@ export default {
   details_graph_label_humidity: 'Humidity',
   details_graph_label_vocs: 'VOCs',
   details_graph_label_co2: 'CO₂',
-  details_subtitle_comfortzone: 'Comfont Zone',
+  details_subtitle_comfortzone: 'Comfort Zone',
   detail_tip_info_label_pm25: 'PM2.5',
   detail_tip_info_level_pm25_1: '0 - 15 : Good / Blue',
   detail_tip_info_level_pm25_2: '16 - 35 : Moderate / Green',

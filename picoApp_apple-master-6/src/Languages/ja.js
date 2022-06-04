@@ -183,7 +183,7 @@ export default {
   details_graph_label_humidity: '湿度',
   details_graph_label_vocs: '揮発性有機化合物',
   details_graph_label_co2: '二酸化炭素',
-  details_subtitle_comfortzone: 'Comfont Zone',
+  details_subtitle_comfortzone: 'Comfort Zone',
   detail_tip_info_label_pm25: 'PM2.5',
   detail_tip_info_level_pm25_1: '0~15：いい／青色',
   detail_tip_info_level_pm25_2: '16~35：普通／緑色',
