@@ -1,6 +1,7 @@
 export default {
   main_popup_title: 'New Version Released!',
   main_popup:'There is a new version of PiCO HOME. Press the button bellow to update!',
+  popup_auto_logout_contents: 'Your account was logged out due to be logged out from other devices. Please log in again.',
   main_popup_button: 'UPDATE',
   onboarding_1_title: 'Welcome to PiCOHOME.',
   onboarding_1_contents: 'You can check the air quality around you.',

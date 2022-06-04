@@ -12,6 +12,7 @@ import {
   Linking
 } from 'react-native';
 import {
+  AuthContext,
   UserContext,
   DeviceAndAirInfoContext,
   TempContext,
@@ -44,6 +45,7 @@ export const Home = ({navigation}) => {
   const snapShotAndCount = useContext(SnapShotAndCountContext);
   const tempMod = useContext(TempContext);
   const userInfo = useContext(UserContext);
+  const { signOut } = useContext(AuthContext);
   const [connectInfo, setConnectInfo]=useState(false);
 
   const [latitude, setLatitude] = useState(null);
@@ -64,7 +66,7 @@ export const Home = ({navigation}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [pollenExplain, setPollenEx] = useState(false);
   const [isOffLine, setIsOffLine] = useState(false);
-
+  const [isForcedLogout, setIsForcedLogout] = useState(false);
   
   function open_WhatsApp() {
  
@@ -258,8 +260,10 @@ export const Home = ({navigation}) => {
     )
       .then((response) => response.json())
       .then((res) => {
-        //console.log(res);
-        setPublicAirInfo(res);
+        if (res.Status === 'ERROR' && res.Msg === 'err_invalid_api_key')
+          setIsForcedLogout(true)
+        else
+          setPublicAirInfo(res)
       })
       .catch((error) => {
         //console.error(error);
@@ -398,7 +402,7 @@ export const Home = ({navigation}) => {
           //console.log(res);
           //console.log(res.version);
 
-        if(res.version != "3.0.16"){
+        if(res.version != "3.0.15"){
           //console.log("different version");
           setConnectInfo(true);
         }else{
@@ -995,6 +999,18 @@ export const Home = ({navigation}) => {
         </View>
       </Modal>
 
+      <Modal isVisible={isForcedLogout}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalSubTextView}>
+            <Text style={styles.modalSubText}>{strings.popup_auto_logout_contents}</Text>
+          </View>
+          <TouchableOpacity onPress={() => signOut()}>
+            <View style={[styles.modalButton, { width: width * 0.8 }]}>
+              <Text style={styles.modalButtonText}>{strings.popup_button_ok}</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   );
 };

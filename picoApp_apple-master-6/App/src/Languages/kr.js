@@ -1,7 +1,8 @@
 export default {
   main_popup_title: '새로운 버전 출시',
- main_popup:'피코홈의 업데이트 버전이 배포되었습니다. 업데이트를 원하시면 아래 버튼을 눌러주세요.',
- main_popup_button: '업데이트',
+  main_popup:'피코홈의 업데이트 버전이 배포되었습니다. 업데이트를 원하시면 아래 버튼을 눌러주세요.',
+  popup_auto_logout_contents: '다른기기에서 로그아웃되어 자동로그아웃합니다. 앱을 이용하려면 다시 로그인해주세요.',
+  main_popup_button: '업데이트',
   onboarding_1_title: '환영합니다',
   onboarding_1_contents: '당신 주변의 공기질을 확인하세요',
   onboarding_1_button_skip: '건너뛰기',

@@ -1,8 +1,8 @@
 export default {
   main_popup_title: '新しいバージョン',
   main_popup:'ピコホームのアプリに新しいバージョンがあります。アップデートしてください',
+  popup_auto_logout_contents: '他の機器からログアウトする場合は自動的にログアウトされます。 再度ログインして下さい。',
   main_popup_button: 'アップデート',
-
   onboarding_1_title: 'ようこそ、ピコホームへ。',
   onboarding_1_contents: 'あなたの周りの空気の質をご確認ください。',
   onboarding_1_button_skip: 'スキップ',
