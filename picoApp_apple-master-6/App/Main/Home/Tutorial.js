@@ -938,8 +938,8 @@ const styles = StyleSheet.create({
   },
   picoDeviceSetting: {
     position: 'absolute',
-    top: imageHeight * 0.22,
-    right: imageWidth * 0.2,
+    top: imageHeight * 0.24,
+    right: imageWidth * 0.05,
     width: 16,
     height: 16,
   },
