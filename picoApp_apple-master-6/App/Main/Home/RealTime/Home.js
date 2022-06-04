@@ -864,17 +864,17 @@ export const Home = ({navigation}) => {
                                   <Text style={styles.picoTemp}>
                                     {tempMod
                                       ? Math.round(
-                                          (item.stateInfo.temp / 10.0) * 1.8 +
+                                          (item.stateInfo.temp) * 1.8 +
                                             32,
                                         )
-                                      : Math.round(item.stateInfo.temp / 10.0)}
+                                      : Math.round(item.stateInfo.temp)}
                                   </Text>
                                   <Text style={styles.picoTempUnit}>
                                     {tempMod ? '°F' : '°C'}
                                   </Text>
                                   <Text>{'   '}</Text>
                                   <Text style={styles.picoHumdi}>
-                                    {Math.round(item.stateInfo.humd / 10.0)}
+                                    {Math.round(item.stateInfo.humd)}
                                   </Text>
                                   <Text style={styles.picoHumdiUnit}>%</Text>
                                 </View>
