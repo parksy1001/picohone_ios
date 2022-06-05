@@ -155,9 +155,8 @@ export default {
   wifisetting_3_popup_label_network: '네트워크 이름',
   wifisetting_3_popup_label_password: '비밀번호',
   wifisetting_3_popup_input_password: '비밀번호',
-  wifisetting_3_popup_error_title: '죄송합니다.',
-  wifisetting_3_popup_error:
-    '설정에 실패했습니다. 비밀번호나 Wi-Fi(2.4GHz)를 확인하세요.',
+  wifisetting_3_popup_error_title: '설정에 실패했어요!',
+  wifisetting_3_popup_error: `1. 와이파이 비밀번호나 와이파이 주파수(2.4GHz)를 확인해주세요.\n2. 피코홈에서 자주색 불빛이 보인다면, 업데이트 중이니 기다려주세요. 기기가 자동으로 꺼지면, 다시 전원을 키고 와이파이를 설정해주세요.\n3. 더 자세한 내용은 '도움말'이나 'www.brilcom.com'에서 확인해주세요.`,
   wifisetting_3_popup_button_ok: '확인',
   wifisetting_4_title: '피코홈 설정',
   wifisetting_4_label_name: '피코홈 이름',

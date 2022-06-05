@@ -155,9 +155,8 @@ export default {
   wifisetting_3_popup_label_network: 'Network Name',
   wifisetting_3_popup_label_password: 'Password',
   wifisetting_3_popup_input_password: 'Password',
-  wifisetting_3_popup_error_title: 'Sorry',
-  wifisetting_3_popup_error:
-    'Setup has failed. Please check the password or the Wi-Fi band (2.4 GHz only).',
+  wifisetting_3_popup_error_title: 'Setup failed!',
+  wifisetting_3_popup_error: `1. Please check the password of Wi-Fi or Wi-Fi band(2.4 GHz only).\n2. If you can see the red purple light of PiCOHOME, please wait until the device is updated. After the device is turned off automatically , please turn it on and set up Wi-Fi again.\n3. You can find more details on 'Help' or 'www.brilcom.com'.`,
   wifisetting_3_popup_button_ok: 'OK',
   wifisetting_4_title: 'Set up PiCOHOME',
   wifisetting_4_label_name: 'PiCOHOME Name',
