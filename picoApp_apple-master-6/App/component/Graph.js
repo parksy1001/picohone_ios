@@ -178,7 +178,7 @@ export const Graph = (props) => {
     let d = date.getDate();
 
     const time_diff = date.getTimezoneOffset() / 60;
-
+    
     if (d - (props.day) <= 0) {
       if (m === 1 || m === 2 || m === 4 || m === 6 || m === 8 || m === 9 || m === 11) {
         if (m === 1) {
@@ -517,12 +517,13 @@ export const Graph = (props) => {
                 tempDeviceAirInfo = [...tempDeviceAirInfo, ...res.data]
                 
                 const timezoneOffset = new Date().getTimezoneOffset() * 60000;
-
                 // UTC 시간으므로 로컬 시간으로 바꿔줘야 함.
                 tempDeviceAirInfo = tempDeviceAirInfo.map(item => {
+                  let localReportTime = new Date(new Date(`${item.ReportTime}.000Z`) * 1 - timezoneOffset).toISOString()
+                  
                   return {
-                  ...item,
-                  ReportTime: new Date(new Date(item.ReportTime) * 1 - timezoneOffset).toISOString(),
+                    ...item,
+                    ReportTime: localReportTime,
                   }
               })
                 setDeviceAirInfo(tempDeviceAirInfo);
