@@ -9,34 +9,40 @@ import {
   TextInput,
   Image,
   ActivityIndicator,
+  NativeModules,
 } from 'react-native';
 import {LanguageContext} from '../../../context';
 import {BleManager} from 'react-native-ble-plx';
 import {PicoDevice} from './FindPicoToWiFi';
 import {ScrollView} from 'react-native-gesture-handler';
-import database from '@react-native-firebase/database';
-// import WifiManager from 'react-native-wifi-reborn';
 import base64 from 'react-native-base64';
 import colors from '../../../src/colors';
 import NetInfo from '@react-native-community/netinfo';
+import useTimer from '../../../src/hook/useTimer';
 
+const { Wifi } = NativeModules;
 export const bleManager = new BleManager();
+
+const CONNECT_TIME = 30
+const WIFI_REFRESH_TIME = 30
+
 export const ConnectWiFi = ({navigation}) => {
   const strings = useContext(LanguageContext);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [count, setCount] = useState(-1);
+  const [count, isCountClear, startCount, stopCount] = useTimer()
+  const [_, isWifiCountClear, startWifiCount] = useTimer()
   const [serial, setSerial] = useState('');
 
-  // 일단 password 확인이 안되므로 잠시 보류
-  // const [pwValidate, setPwValidate] = useState(null);
   const [isSecure, setIsSecure] = useState(true);
   const [currentSSID, setCurrentSSID] = useState(null);
   const [password, setPassword] = useState(null);
 
+  const [firmware, setFirmware] = useState('')
+
+  const [publicwifimodal, setPublicWifiModal] = useState(false);
   const [sorryModal, setSorryModal] = useState(false);
   const [wifiModal, setWiFiModal] = useState(false);
-  const [isWiFi, setIsWiFi] = useState(false);
   const [checkWiFiModal, setCheckWiFiModal] = useState(false);
   // wifiList는 iOS에서 안 먹힘
   // const [wifiList, setWiFiList] = useState([]);
@@ -68,17 +74,10 @@ export const ConnectWiFi = ({navigation}) => {
   const getSerialNum = () => {
     let temp = '';
     for (let i = 0; i < 6; i++) {
-      if (i === 5) {
         let a = '' + getHexaChar(parseInt(PicoDevice.serial[i] / 16));
         let b = '' + getHexaChar(PicoDevice.serial[i] % 16);
         temp = temp + a + b;
-      } else {
-        let a = '' + getHexaChar(parseInt(PicoDevice.serial[i] / 16));
-        let b = '' + getHexaChar(PicoDevice.serial[i] % 16);
-        temp = temp + a + b + ':';
-      }
     }
-    // console.log(temp);
     setSerial(temp);
   };
 
@@ -146,11 +145,20 @@ export const ConnectWiFi = ({navigation}) => {
     return bin2String(result);
   };
 
-  var connectDeviceToWiFi = function () {
+  const connectDeviceToWiFi = function() {
     setWiFiModal(false);
+    setPublicWifiModal(false);
     setIsLoading(false);
-    // console.log('a');
-
+    
+    bleManager
+      .readCharacteristicForDevice(
+        PicoDevice.device.id,
+        '0000180A',
+        '00002A26-0000-1000-8000-00805f9b34fb'
+      )
+      .then(({ value }) => {
+        setFirmware(base64.decode(value))
+      })
     bleManager
       .writeCharacteristicWithResponseForDevice(
         PicoDevice.device.id,
@@ -159,38 +167,59 @@ export const ConnectWiFi = ({navigation}) => {
         base64.encode(currentSSID),
       )
       .then((data) => {
-        // console.log('b');
         bleManager
           .writeCharacteristicWithResponseForDevice(
             PicoDevice.device.id,
             '0000ffe0-0000-1000-8000-00805f9b34fb',
             '0000ffe3-0000-1000-8000-00805f9b34fb',
-            base64.encode(encryptPassword(serial, password)),
+            base64.encode(encryptPassword(PicoDevice.device.id, password)),
           )
           .then((data) => {
-            // console.log(data);
             PicoDevice.device.cancelConnection();
-            setCount(30);
+            startCount(CONNECT_TIME);
           })
           .catch((error) => navigation.navigate('Connect'));
       })
       .catch((error) => navigation.navigate('Connect'));
   };
 
-  var encryptPassword = function (peripheral, password) {
-    let macAddress = replaceAll(peripheral, ':', '');
-    let pwArray = toUTF8Array(password);
-    let seed = new Array(password.length);
-    for (let i = 0; i < toUTF8Array(macAddress).length; i++) {
-      if (i < pwArray.length) {
-        seed[i] = toUTF8Array(macAddress)[i];
-      }
-    }
-    let result = new Array(pwArray.length);
-    for (let i = 0; i < pwArray.length; i++) {
-      result[i] = pwArray[i] ^ seed[i];
-    }
-    return bin2String(result);
+  const connectDeviceToPublicWiFi = function() {
+    setWiFiModal(false);
+    setPublicWifiModal(false);
+    setIsLoading(false);
+    
+    bleManager
+      .readCharacteristicForDevice(
+        PicoDevice.device.id,
+        '0000180A',
+        '00002A26-0000-1000-8000-00805f9b34fb'
+      )
+      .then(({ value }) => {
+        setFirmware(base64.decode(value))
+        console.log(base64.decode(value));
+      })
+    bleManager
+      .writeCharacteristicWithResponseForDevice(
+        PicoDevice.device.id,
+        '0000ffe0-0000-1000-8000-00805f9b34fb',
+        '0000ffe2-0000-1000-8000-00805f9b34fb',
+        base64.encode(currentSSID),
+      )
+      .then((data) => {
+        bleManager
+          .writeCharacteristicWithResponseForDevice(
+            PicoDevice.device.id,
+            '0000ffe0-0000-1000-8000-00805f9b34fb',
+            '0000ffe3-0000-1000-8000-00805f9b34fb',
+            base64.encode(password),
+          )
+          .then((data) => {
+            PicoDevice.device.cancelConnection();
+            startCount(CONNECT_TIME);
+          })
+          .catch((error) => navigation.navigate('Connect'));
+      })
+      .catch((error) => navigation.navigate('Connect'));
   };
 
   /*
@@ -225,79 +254,102 @@ export const ConnectWiFi = ({navigation}) => {
   */
 
   useEffect(() => {
-    /*
-    WifiManager.getCurrentWifiSSID().then(
-      (ssid) => {
-        console.log('Your current connected wifi SSID is ' + ssid);
-      },
-      () => {
-        console.log('Cannot get current SSID!');
-      },
-    );
-    */
-
     NetInfo.fetch().then((state) => {
-      console.log(state);
       if (state.type === 'wifi') {
-        setIsWiFi(true);
-        setCurrentSSID(state.details.ssid);
-        setWiFiModal(true);
+        Wifi.getWifiSecurityType().then(
+          securityType => {
+            console.log({securityType})
+            setCurrentSSID(state.details.ssid);
+            if (securityType === 0) {
+              setPublicWifiModal(true);
+              setPassword('FFFFF')
+            }
+            else {
+              setWiFiModal(true);
+            }
+          }
+        )
       } else {
         setCheckWiFiModal(true);
       }
     });
 
-    /*
-    console.log(IOSWifiManager.currentSSID());
-    */
+    startWifiCount(WIFI_REFRESH_TIME)
+
+    setTimeout(() => {
+      setIsLoading(true);
+    }, 3000);
   }, []);
 
-  // 1초마다 count 갱신
   useEffect(() => {
-    let countID = setInterval(() => countDown(), 1000);
-    return function cleanup() {
-      clearInterval(countID);
-    };
-  });
+    setTimeout(() => {
+      setIsLoading(true);
+    }, 3000);
+    
+    getSerialNum();
+  }, []);
 
   useEffect(() => {
-    let id = replaceAll(serial, ':', '');
     let name = PicoDevice.device.name;
 
-    let year = database().getServerTime().getFullYear();
-    let month = leadingZeros(database().getServerTime().getMonth() + 1, 2);
-    let day = leadingZeros(database().getServerTime().getUTCDate(), 2);
-    let hour = leadingZeros(database().getServerTime().getUTCHours(), 2);
-    let min = leadingZeros(database().getServerTime().getMinutes(), 2);
-    let sec = leadingZeros(
-      checkMinus(database().getServerTime().getSeconds() - 1),
-      2,
-    );
+    console.log({serial});
+    console.log(name);
 
-    let uri = '/devices/' + id + '/' + year + month + day + hour + min + sec;
+    var date = new Date();
+    date.setSeconds(date.getSeconds() - 20);
+    date = date.toISOString();
+    const start_time = date.substring(0, 4) + date.substring(5, 7) + date.substring(8, 10) + date.substring(11, 13) + date.substring(14, 16) + date.substring(17, 19);
+    //console.log("start time is "+start_time);
+    //var end_time= new Date();
+    var d = new Date();
+    var v = new Date();
+    v.setMinutes(d.getMinutes() + 30);
+    v = v.toISOString();
+    //console.log(v);
+    const end_time = v.substring(0, 4) + v.substring(5, 7) + v.substring(8, 10) + v.substring(11, 13) + v.substring(14, 16) + v.substring(17, 19);
+    //var end_time = start_time
+    //console.log("end time is "+end_time);
+    if (count >= 0) {
+      try {
+        console.log('start of request');
+        fetch('http://mqtt.brilcom.com:8080/mqtt/GetAirQualityBySec', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',//서버로 보낼 때 무엇으로 보내는 것인지 알려줌
+          },
+          body: JSON.stringify({
+            serialNum: serial,
+            startTime: start_time,
+            endTime: end_time,
+            type: 'Co2,Humid,Pm10,Pm25,Temperature,Tvoc',
+          }),
+        })
+          .then((response) => response.json())
+          .then((result) => {
+            console.log('result is =====' + JSON.stringify(result));
 
-    database()
-      .ref(uri)
-      .once('value')
-      .then((snapshot) => {
-        // snapshot이 들어오면 와이파이가 정상적으로 붙어서 Realtime DB에 데이터가 전송된다는 뜻!
-        if (snapshot.val() != null) {
-          setCount(-1);
-          setIsLoading(true);
-          navigation.navigate('SetUpPico', {id: id, name: name});
-        } else {
-          // 30초간 Realtime DB에 데이터가 입력되지 않았으므로 와이파이 연결에 실패했다고 가정.
-          if (count === 0) {
-            setCount(-1);
-            setIsLoading(true);
-            setSorryModal(true);
-          }
-        }
-      });
-  }, [count]);
+            if (isCountClear) {
+              // 30초간 Realtime DB에 데이터가 입력되지 않았으므로 와이파이 연결에 실패했다고 가정.
+              setIsLoading(true);
+              setSorryModal(true);
+              return
+            }
 
-  // 한자리 수 숫자일 경우 십의 자리 수에 0추가
-  function leadingZeros(n, digits) {
+            if (result?.data?.length > 0) {
+              stopCount()
+              setIsLoading(true);
+              navigation.navigate('SetUpPico', { id: serial, name, firmware });
+            }
+          });
+      } catch (exception) {
+        console.log('ERROR :: ', exception);
+      }
+    }
+  }, [count, isCountClear]);
+
+   // 한자리 수 숫자일 경우 십의 자리 수에 0추가
+   function leadingZeros(n, digits) {
     let zero = '';
     n = n.toString();
     if (n.length < digits) {
@@ -315,20 +367,6 @@ export const ConnectWiFi = ({navigation}) => {
       return props;
     }
   };
-
-  const countDown = () => {
-    if (count > 0) {
-      setCount(count - 1);
-    }
-  };
-
-  useEffect(() => {
-    setTimeout(() => {
-      setIsLoading(true);
-    }, 3000);
-    getSerialNum();
-    // console.log(PicoDevice);
-  }, []);
 
   return (
     <ScrollView style={styles.container}>
@@ -430,6 +468,45 @@ export const ConnectWiFi = ({navigation}) => {
             </View>
           </View>
         </Modal>
+
+        {/* public 와이파이 항목에 대한 연결 Modal */}
+        <Modal
+          animationType="slide"
+          statusBarTranslucent={true}
+          transparent={true}
+          visible={publicwifimodal}
+          onDismiss={() => setPublicWifiModal(false)}
+          onRequestClose={() => {
+            setPublicWifiModal(false);
+          }}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalBox}>
+              <TouchableOpacity style={styles.modalCancel} onPress={() => setPublicWifiModal(false)}>
+                <Image source={require('../../../../Assets/img/icCancel.png')} />
+              </TouchableOpacity>
+              <Text style={styles.modalTitle}>{strings.wifi_publicwifi_connect}</Text>
+              <View style={styles.networkBox}>
+                <Text style={styles.networkText}>{strings.wifisetting_3_popup_label_network}</Text>
+                <Text style={styles.networkNameText}>{currentSSID}</Text>
+              </View>
+              {/* <View style={styles.pwBox}>
+                <Text style={styles.pwBoxText}>{strings.wifisetting_3_popup_label_password}</Text>
+                <View style={styles.pwInputBox}>
+                  <Image source={require('../../../../Assets/img/icLock.png')} />
+                  <TextInput
+                    style={styles.pwInputBoxText}
+                    placeholder={strings.wifisetting_3_popup_input_password}
+                  />
+               </View>
+              </View>  */}
+
+              <TouchableOpacity style={styles.buttonStyle} onPress={() => connectDeviceToPublicWiFi()}>
+                <Text style={styles.buttonText}>{strings.wifisetting_3_popup_button_ok}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
         {/* 와이파이 비밀번호가 맞지 않을 경우 발생하는 Modal */}
         <Modal
           animationType="slide"
