@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState,  } from 'react';
 import {BackHandler} from 'react-native';
 import { StyleSheet, View, Text, Image, Dimensions, ActivityIndicator, NativeModules } from 'react-native';
 import { BackToFromContext, LanguageContext } from '../context';
-import { PicoDevice } from '../Main/Home/Connect/FindPicoToScan';
+import { PicoDevice } from '../Auth/FindPicoToScan';
 import colors from '../src/colors';
 import cal from '../src/calculate';
 import cnt from '../src/constant';

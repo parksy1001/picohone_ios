@@ -1,5 +1,5 @@
 import React from 'react';
-import { StatusBar } from 'react-native';
+import { SafeAreaView, StatusBar } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 export const WebViewScreen = ({ route }) => {
@@ -16,9 +16,9 @@ export const WebViewScreen = ({ route }) => {
   };
 
   return (
-    <>
+    <SafeAreaView style={{ flex: 1 }}>
       <StatusBar barStyle="dark-content" translucent={false} />
       <WebView source={{ uri: getWebUri(type) }} />
-    </>
+    </SafeAreaView>
   );
 };

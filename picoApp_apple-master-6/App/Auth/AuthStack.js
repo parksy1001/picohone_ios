@@ -241,7 +241,22 @@ export const AuthStackScreen = ({navigation}) => {
               name="WebView"
               component={WebViewScreen}
               options={{
-                headerShown: false,
+                title: "",
+                headerStyle: {
+                  borderBottomWidth: 0,
+                  backgroundColor: colors.white,
+                  shadowOpacity: 0,
+                  elevation: 0,
+                },
+                headerBackTitleStyle: {
+                  color: 'transparent',
+                },
+                headerBackImage: () => (
+                  <Image
+                    style={{marginLeft: width * 0.05}}
+                    source={require('../../Assets/img/icArrowLeft.png')}
+                  />
+                ),
               }}
             />
           </AuthStack.Navigator>
