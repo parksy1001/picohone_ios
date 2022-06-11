@@ -172,7 +172,7 @@ export const ConnectWiFi = ({navigation}) => {
             PicoDevice.device.id,
             '0000ffe0-0000-1000-8000-00805f9b34fb',
             '0000ffe3-0000-1000-8000-00805f9b34fb',
-            base64.encode(encryptPassword(PicoDevice.device.id, password)),
+            base64.encode(encryptPassword(serial, password)),
           )
           .then((data) => {
             PicoDevice.device.cancelConnection();
@@ -269,9 +269,17 @@ export const ConnectWiFi = ({navigation}) => {
             }
           }
         )
+        .catch((e) => {
+          console.log(e);
+          navigation.navigate('Connect')
+        });
       } else {
         setCheckWiFiModal(true);
       }
+    })
+    .catch((e) => {
+      console.log(e);
+      navigation.navigate('Connect')
     });
 
     startWifiCount(WIFI_REFRESH_TIME)
