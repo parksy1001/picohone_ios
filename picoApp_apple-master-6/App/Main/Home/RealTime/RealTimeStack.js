@@ -66,7 +66,7 @@ export const RealTimeStackScreen = () => {
         })
           .then((response) => response.json())
           .then((res) => {
-
+            console.log(res.data);
             if (res.data.length>0) {
               co2[idx]= res.data[0].Co2;
               humid[idx]= res.data[0].Humid;
@@ -74,6 +74,13 @@ export const RealTimeStackScreen = () => {
               pm25[idx]= res.data[0].Pm25;
               temperature[idx]= res.data[0].Temperature;
               tvoc[idx]= res.data[0].Tvoc;
+            } else if (res.data.length === 0) {
+              co2[idx]= NaN;
+              humid[idx]= NaN;
+              pm10[idx]= NaN;
+              pm25[idx]= NaN;
+              temperature[idx]= NaN;
+              tvoc[idx]= NaN;
             }
           });
       } catch (exception) {
