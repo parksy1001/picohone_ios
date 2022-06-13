@@ -31,6 +31,7 @@ import Modal from 'react-native-modal';
 import colors from '../../../src/colors';
 import cal from '../../../src/calculate';
 import cnt from '../../../src/constant';
+import {useStateCallbackAfter500} from '../../../src/hook/useStateCallback';
 
 export const Home = ({navigation}) => {
   const strings = useContext(LanguageContext);
@@ -51,28 +52,29 @@ export const Home = ({navigation}) => {
   const tempMod = useContext(TempContext);
   const userInfo = useContext(UserContext);
   const { signOut } = useContext(AuthContext);
-  const [connectInfo, setConnectInfo]=useState(false);
-
+  
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
   const [addressName, setAddressName] = useState('-');
-
+  
   const [date, setDate] = useState(new Date());
   const [amPm, setAmPm] = useState('AM');
   const [publicAirInfo, setPublicAirInfo] = useState(null);
-
+  
   const [publicStateInfo, setPublicStateInfo] = useState(null);
   const [publicPm25, setPublicPm25] = useState(0);
   const [publicPm10, setPublicPm10] = useState(0);
   const [publicO3, setPublicO3] = useState(0);
   const [publicPollenTree, setPublicPollenTree] = useState(0);
   const [publicPollenWeed, setPublicPollenWeed] = useState(0);
-
+  
   const [isLoading, setIsLoading] = useState(false);
   const [pollenExplain, setPollenEx] = useState(false);
-  const [isFirmwareUpdate, setIsFirmwareUpdate] = useState(false);
   const [isOffLine, setIsOffLine] = useState(false);
-  const [isForcedLogout, setIsForcedLogout] = useState(false);
+  
+  const [connectInfo, setConnectInfo]= useStateCallbackAfter500(false);
+  const [isFirmwareUpdate, setIsFirmwareUpdate] = useStateCallbackAfter500(false);
+  const [isForcedLogout, setIsForcedLogout] = useStateCallbackAfter500(false);
   
   const [getLatestFirmwareVersion, getDeviceFirmwareVersion] = useCheckFirmwareVersion()
 
@@ -1124,7 +1126,19 @@ export const Home = ({navigation}) => {
           <ActivityIndicator size="large" color={colors.azure} />
         </View>
       )}
-    <Modal isVisible={connectInfo} onBackdropPress={() => setConnectInfo(false)}>
+    <Modal 
+      isVisible={connectInfo} 
+      onBackdropPress={() => setConnectInfo(false)}
+      onModalHide={() => {
+        // 모달 여러개를 띄우기 위해 modal 값을 토글 함
+        if (isFirmwareUpdate) {
+          setIsFirmwareUpdate(false, () => setIsFirmwareUpdate(true));
+        } else if (isForcedLogout) {
+          setIsForcedLogout(false, () => setIsForcedLogout(true));
+        }
+      }}
+      style={{zIndex: 1}}
+    >
         <View style={styles.modalContainer}>
           <View style={styles.modalCancel}>
             <TouchableOpacity onPress={() => setConnectInfo(false)}>
@@ -1145,7 +1159,18 @@ export const Home = ({navigation}) => {
         </View>
       </Modal>
 
-      <Modal isVisible={isFirmwareUpdate} onBackdropPress={() => setIsFirmwareUpdate(false)}>
+      <Modal 
+        isVisible={isFirmwareUpdate} 
+        onBackdropPress={() => setIsFirmwareUpdate(false)}
+        onModalHide={() => {
+          // 모달 여러개를 띄우기 위해 modal 값을 토글 함
+          if (connectInfo) {
+            setConnectInfo(false, () => setConnectInfo(true));
+          } else if (isForcedLogout) {
+            setIsForcedLogout(false, () => setIsForcedLogout(true));
+          }
+        }}
+      >
         <View style={styles.modalContainer}>
           <View style={styles.modalCancel}>
             <TouchableOpacity onPress={() => setIsFirmwareUpdate(false)}>
@@ -1166,7 +1191,17 @@ export const Home = ({navigation}) => {
         </View>
       </Modal>
 
-      <Modal isVisible={isForcedLogout}>
+      <Modal 
+        isVisible={isForcedLogout}
+        onModalHide={() => {
+          // 모달 여러개를 띄우기 위해 modal 값을 토글 함
+          if (connectInfo) {
+            setConnectInfo(false, () => setConnectInfo(true), 500);
+          } else if (isFirmwareUpdate) {
+            setIsFirmwareUpdate(false, () => setIsFirmwareUpdate(true), 500);
+          }
+        }}
+      >
         <View style={styles.modalContainer}>
           <View style={styles.modalSubTextView}>
             <Text style={styles.modalSubText}>{strings.popup_auto_logout_contents}</Text>
