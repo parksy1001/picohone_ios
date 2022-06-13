@@ -220,7 +220,7 @@ export const Scan = ({navigation}) => {
                 </Text>
               </View>
               <Text style={[styles.pm25m3, {color: getPm25Color(pm25)}]}>
-                μg/m3
+                μg/m³
               </Text>
             </View>
           </View>
@@ -241,7 +241,7 @@ export const Scan = ({navigation}) => {
                 </Text>
               </View>
               <Text style={[styles.pm10m3, {color: getPm10Color(pm10)}]}>
-                μg/m3
+                μg/m³
               </Text>
             </View>
           </View>

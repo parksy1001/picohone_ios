@@ -43,6 +43,10 @@ export const Home = ({navigation}) => {
 
   const devices = useContext(DeviceContext);
   const deviceAndAirInfo = useContext(DeviceAndAirInfoContext);
+  // const deviceAndAirInfo = [
+  //   {stateInfo: {"co2": 464, "humid": 53, "Lat": "", "Lng": "", "pm10": 7, "pm25": 10, "ReportTime": "20220613125200", "Temperature": "27.4", "vocs": 11, "dataType": "M", "ip": "172.30.1.9", "myreport": "2022-06-13 21:52:00", "serialNum": "AC67B25CC392"}},
+  //   {stateInfo: {"co2": 464, "humid": 53, "Lat": "", "Lng": "", "pm10": 7, "pm25": 10, "ReportTime": "20220613125200", "Temperature": "27.4", "vocs": 11, "dataType": "M", "ip": "172.30.1.9", "myreport": "2022-06-13 21:52:00", "serialNum": "AC67B25CC392"}},
+  // ]
   const snapShotAndCount = useContext(SnapShotAndCountContext);
   const tempMod = useContext(TempContext);
   const userInfo = useContext(UserContext);
@@ -424,7 +428,7 @@ export const Home = ({navigation}) => {
           //console.log(res);
           //console.log(res.version);
 
-        if(res.version != "3.0.15"){
+        if(res.version != "3.0.16"){
           //console.log("different version");
           setConnectInfo(true);
         }else{
@@ -1340,7 +1344,7 @@ const styles = StyleSheet.create({
     fontFamily: 'glogo',
     fontWeight: '800',
     fontStyle: 'normal',
-    fontSize: 30,
+    fontSize: 32,
     lineHeight: 30,
   },
   pm25StateUnit: {
@@ -1369,7 +1373,7 @@ const styles = StyleSheet.create({
     fontFamily: 'glogo',
     fontWeight: '800',
     fontStyle: 'normal',
-    fontSize: 30,
+    fontSize: 32,
     lineHeight: 30,
   },
   pm10StateUnit: {
@@ -1398,7 +1402,7 @@ const styles = StyleSheet.create({
     fontFamily: 'glogo',
     fontWeight: '800',
     fontStyle: 'normal',
-    fontSize: 30,
+    fontSize: 32,
     lineHeight: 30,
   },
   ozoneStateUnit: {
@@ -1434,7 +1438,7 @@ const styles = StyleSheet.create({
     fontFamily: 'glogo',
     fontWeight: '800',
     fontStyle: 'normal',
-    fontSize: 30,
+    fontSize: 32,
     lineHeight: 30,
   },
   pollenStateUnit: {
@@ -1644,7 +1648,7 @@ const styles = StyleSheet.create({
     fontFamily: 'glogo',
     fontWeight: '800',
     fontStyle: 'normal',
-    fontSize: 30,
+    fontSize: 32,
     lineHeight: 30,
     marginTop: 5,
     color: colors.white,
@@ -1670,7 +1674,7 @@ const styles = StyleSheet.create({
     fontFamily: 'glogo',
     fontWeight: '800',
     fontStyle: 'normal',
-    fontSize: 30,
+    fontSize: 32,
     lineHeight: 30,
     marginTop: 5,
     color: colors.white,
@@ -1697,7 +1701,7 @@ const styles = StyleSheet.create({
     fontFamily: 'glogo',
     fontWeight: '800',
     fontStyle: 'normal',
-    fontSize: 30,
+    fontSize: 32,
     lineHeight: 30,
     marginTop: 5,
     color: colors.white,
@@ -1723,7 +1727,7 @@ const styles = StyleSheet.create({
     fontFamily: 'glogo',
     fontWeight: '800',
     fontStyle: 'normal',
-    fontSize: 30,
+    fontSize: 32,
     lineHeight: 30,
     marginTop: 5,
     color: colors.white,
