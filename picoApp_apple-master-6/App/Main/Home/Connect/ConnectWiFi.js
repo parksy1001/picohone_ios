@@ -254,11 +254,20 @@ export const ConnectWiFi = ({navigation}) => {
   */
 
   useEffect(() => {
+    NetInfo.configure({
+      shouldFetchWiFiSSID: true,
+    });
+
     NetInfo.fetch().then((state) => {
       if (state.type === 'wifi') {
+        console.log(state);
+        if (!state.details.ssid) {
+          setCheckWiFiModal(true);
+          return
+        }
         Wifi.getWifiSecurityType().then(
           securityType => {
-            console.log({securityType})
+            console.log(state.details.ssid, {securityType})
             setCurrentSSID(state.details.ssid);
             if (securityType === 0) {
               setPublicWifiModal(true);
