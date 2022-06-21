@@ -13,19 +13,22 @@ import {
 } from 'react-native';
 import {
   LanguageContext,
-  PlaceListContext,
+  LocaleContext,
   SettingContext,
   UserContext,
 } from '../../../context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Modal from 'react-native-modal';
 import colors from '../../../src/colors';
+import initialPlace from '../../../src/InitialPlace';
 
 export const SetUpPico = ({navigation, route}) => {
   const {getDeviceState} = useContext(SettingContext);
   const strings = useContext(LanguageContext);
   const userInfo = useContext(UserContext);
-  const placeList = useContext(PlaceListContext);
+  const [placeList, setPlaceList] = useState([]);
+  const locale = useContext(LocaleContext);
+  const defaultPlaceList = initialPlace[locale].split('/')
 
   const { id, name, firmware } = route.params;
 
@@ -42,6 +45,61 @@ export const SetUpPico = ({navigation, route}) => {
   const [showPlace, setShowPlace] = useState(false);
   const [showAddPlace, setShowAddPlace] = useState(false);
   const [registError, setRegistError] = useState(false);
+
+  useEffect(() => {
+    getPlace()
+  }, []);
+
+  const getPlace = () => {
+    AsyncStorage.getItem('placeList').then((value) => {
+      console.log({value});
+      if (value == null) {
+        setPlaceList([]);
+      } else {
+        let realList = []
+        const indexOfFirstEn = value.indexOf(initialPlace["en"])
+        const indexOfFirstJa = value.indexOf(initialPlace["ja"])
+        const indexOfFirstKo = value.indexOf(initialPlace["ko"])
+
+        if (indexOfFirstEn > -1) {
+          realList = value.slice(initialPlace["en"].length)
+          console.log({realList});
+          if (realList.length === 0) {
+            AsyncStorage.setItem('placeList', null);
+            setPlaceList([])
+          } else {
+            realList = realList.slice(1)
+            AsyncStorage.setItem('placeList', realList);
+            setPlaceList(realList.split('/'))
+          }
+        } else if (indexOfFirstJa > -1) {
+          realList = value.slice(initialPlace["ja"].length)
+          console.log({realList});
+          if (realList.length === 0) {
+            AsyncStorage.setItem('placeList', null);
+            setPlaceList([])
+          } else {
+            realList = realList.slice(1)
+            AsyncStorage.setItem('placeList', realList);
+            setPlaceList(realList.split('/'))
+          }
+        } else if (indexOfFirstKo > -1) {
+          realList = value.slice(initialPlace["ko"].length)
+          console.log({realList});
+          if (realList.length === 0) {
+            AsyncStorage.setItem('placeList', null);
+            setPlaceList([])
+          } else {
+            realList = realList.slice(1)
+            AsyncStorage.setItem('placeList', realList);
+            setPlaceList(realList.split('/'))
+          }
+        } else {
+          setPlaceList(value.split('/'));
+        }
+      }
+    });
+  }
 
   const pickPlace = (text) => {
     checkPlaceAccess(text);
@@ -84,9 +142,12 @@ export const SetUpPico = ({navigation, route}) => {
       }),
     })
       .then((res) => res.json())
-      .then((res) => {
+      .then(async (res) => {
         if (res.Msg === 'success') {
           console.log('regist success');
+          getDeviceState(userInfo.userid, userInfo.apiKey);
+          setDevicePlaceAccess(false);
+
           getDeviceState(userInfo.userid, userInfo.apiKey);
           setTimeout(() => {
             navigation.navigate('RealTime');
@@ -113,21 +174,29 @@ export const SetUpPico = ({navigation, route}) => {
     );
   };
 
-  const addPlaceList = () => {
-    let tempPlaceList = placeList;
+  const addPlaceList = async () => {
+    let tempPlaceList = [...placeList];
     let s = '';
-    tempPlaceList.push(newDevicePlace);
 
-    for (let i = 0; i < tempPlaceList.length; i++) {
-      if (i === tempPlaceList.length - 1) {
-        s = s + tempPlaceList[i];
-      } else {
-        s = s + tempPlaceList[i] + '/';
+    if (!tempPlaceList.includes(newDevicePlace) && !defaultPlaceList.includes(newDevicePlace)) {
+      tempPlaceList.push(newDevicePlace);
+
+      for (let i = 0; i < tempPlaceList.length; i++) {
+        if (i === tempPlaceList.length - 1) {
+          s = s + tempPlaceList[i];
+        } else {
+          s = s + tempPlaceList[i] + '/';
+        }
       }
-    }
 
-    AsyncStorage.setItem('placeList', s);
-    setDevicePlaceAccess(true);
+      await AsyncStorage.setItem('placeList', s);
+      getPlace()
+    }
+    setShowAddPlace(false);
+  };
+
+  const resetModal = () => {
+    setShowPlace(false);
     setShowAddPlace(false);
   };
 
@@ -215,7 +284,7 @@ export const SetUpPico = ({navigation, route}) => {
                   />
                 </TouchableOpacity>
                 <FlatList
-                  data={placeList}
+                  data={[...defaultPlaceList , ...placeList]}
                   renderItem={(item) => makePlaceList(item)}
                 />
                 <TouchableOpacity
