@@ -41,12 +41,12 @@ export const RealTimeStackScreen = () => {
   const getRealtimeAirInfo2 = (idx) => {
 
     var date= new Date();
-    date.setSeconds(date.getSeconds()-10);
+    date.setSeconds(date.getSeconds() - 15);
     date= date.toISOString();
     var start_time= date.substring(0,4)+date.substring(5,7)+date.substring(8,10)+date.substring(11,13)+date.substring(14,16)+date.substring(17,19);
     var d = new Date();
     var v = new Date();
-    v.setMinutes(d.getMinutes()+30);
+    v.setSeconds(d.getSeconds() + 10);
     v=v.toISOString();
     var end_time= v.substring(0,4)+v.substring(5,7)+v.substring(8,10)+v.substring(11,13)+v.substring(14,16)+v.substring(17,19);
 
