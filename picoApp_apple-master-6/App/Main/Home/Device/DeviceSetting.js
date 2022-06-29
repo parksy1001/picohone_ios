@@ -25,7 +25,7 @@ export const DeviceSetting = ({navigation}) => {
   const userInfo = useContext(UserContext);
   const device = useContext(DeviceContext);
   const id = useContext(PicoContext);
-  const [getLatestFirmwareVersion, getDeviceFirmwareVersion] = useCheckFirmwareVersion()
+  const [getLatestFirmwareVersion, getDeviceFirmwareVersion, compareVersion] = useCheckFirmwareVersion()
 
   const [isLoading, setIsLoading] = useState(true);
   const [isLatestVersion, setIsLatestVersion] = useState(true);
@@ -81,9 +81,9 @@ export const DeviceSetting = ({navigation}) => {
     setIsLoading(false)
     
     const latestVersion = await getLatestFirmwareVersion(id)
-    const verson = await getDeviceFirmwareVersion(id)
+    const version = await getDeviceFirmwareVersion(id)
     
-    setIsLatestVersion((latestVersion > verson) || (latestVersion < verson))
+    setIsLatestVersion(!compareVersion(latestVersion, version))
     setIsLoading(true)
   }
 

@@ -76,22 +76,23 @@ export const Home = ({navigation}) => {
   const [isFirmwareUpdate, setIsFirmwareUpdate] = useStateCallbackAfter500(false);
   const [isForcedLogout, setIsForcedLogout] = useStateCallbackAfter500(false);
   
-  const [getLatestFirmwareVersion, getDeviceFirmwareVersion] = useCheckFirmwareVersion()
+  const [getLatestFirmwareVersion, getDeviceFirmwareVersion, compareVersion] = useCheckFirmwareVersion()
 
   const compareFirmwareVersion = async (id) => {
     const latestVersion = await getLatestFirmwareVersion(id)
-    const verson = await getDeviceFirmwareVersion(id)
-
-    return ((latestVersion > verson) || (latestVersion < verson))
+    const version = await getDeviceFirmwareVersion(id)
+    return compareVersion(latestVersion, version)
   }
   const isShowFirmwareUpdate = async () => {
-    let isLatestVersion = true
+    let isNeedFirmwareUpdate = false
 
-    await Promise.all(devices.map(async (_, id) => {
-      isLatestVersion = await compareFirmwareVersion(id)
-    }))
-    
-    setIsFirmwareUpdate(!isLatestVersion)
+    for(let i = 0; i < devices.length; i++) {
+      isNeedFirmwareUpdate = await compareFirmwareVersion(i)    
+      if (isNeedFirmwareUpdate)
+        break;
+    }
+
+    setIsFirmwareUpdate(isNeedFirmwareUpdate)
   }
 
   function open_WhatsApp() {
