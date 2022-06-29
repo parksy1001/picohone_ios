@@ -233,7 +233,7 @@ export const CreateAccount = ({navigation}) => {
                       {strings.signup_confirmemail_popup2_button}
                     </Text>
                   </View>
-                </TouchableOpacity>{' '}
+                </TouchableOpacity>
               </View>
             </View>
           </Modal>

@@ -332,10 +332,22 @@ export const HomeStackScreen = () => {
                     name="WebView"
                     component={WebViewScreen}
                     options={{
+                      title: "",
+                      headerStyle: {
+                        borderBottomWidth: 0,
+                        backgroundColor: colors.white,
+                        shadowOpacity: 0,
+                        elevation: 0,
+                      },
                       headerBackTitleStyle: {
                         color: 'transparent',
                       },
-                      headerShown: false,
+                      headerBackImage: () => (
+                        <Image
+                          style={{marginLeft: width * 0.05}}
+                          source={require('../../../Assets/img/icArrowLeft.png')}
+                        />
+                      ),
                     }}
                   />
                 </HomeStack.Navigator>

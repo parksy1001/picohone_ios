@@ -16,6 +16,7 @@ import {Scan} from './Scan';
 import FindPicoToScan from './FindPicoToScan';
 import colors from '../src/colors';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import { WebViewScreen } from '../Main/Home/WebView';
 
 const AuthStack = createStackNavigator();
 export const AuthStackScreen = ({navigation}) => {
@@ -46,16 +47,14 @@ export const AuthStackScreen = ({navigation}) => {
             },
           );
           let post = await response.json();
-          if (
-            post.Msg === 'success' ||
-            post.Msg === 'User id is aleady existed.'
-          ) {
+          if (post.Msg === 'success') {
             navigation.navigate('CreateAccount');
-          } else {
-            console.log(post.Msg);
+            return { emailExist: false }
+          } else if (post.Msg === 'User id is aleady existed.'){
+            return { emailExist: true }
           }
         } catch (err) {
-          console.error(err);
+          console.error("SignUp", err);
         }
       },
     };
@@ -236,6 +235,28 @@ export const AuthStackScreen = ({navigation}) => {
                   </TouchableOpacity>
                 ),
               
+            }}
+            />
+            <AuthStack.Screen
+              name="WebView"
+              component={WebViewScreen}
+              options={{
+                title: "",
+                headerStyle: {
+                  borderBottomWidth: 0,
+                  backgroundColor: colors.white,
+                  shadowOpacity: 0,
+                  elevation: 0,
+                },
+                headerBackTitleStyle: {
+                  color: 'transparent',
+                },
+                headerBackImage: () => (
+                  <Image
+                    style={{marginLeft: width * 0.05}}
+                    source={require('../../Assets/img/icArrowLeft.png')}
+                  />
+                ),
               }}
             />
           </AuthStack.Navigator>

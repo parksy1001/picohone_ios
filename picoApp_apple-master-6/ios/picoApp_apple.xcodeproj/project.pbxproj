@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* picoApp_appleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* picoApp_appleTests.m */; };
+		0C0A6C7A284BB88C00FDF196 /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C0A6C79284BB88C00FDF196 /* NetworkExtension.framework */; };
+		0C62DF01284F722F00665552 /* Wifi.m in Sources */ = {isa = PBXBuildFile; fileRef = 0C62DF00284F722F00665552 /* Wifi.m */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
@@ -19,7 +21,6 @@
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* picoApp_appleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* picoApp_appleTests.m */; };
 		4C989CB52D7A1711CE928C5A /* libPods-picoApp_apple.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B05D2C0D52DC056ACBAEEDA4 /* libPods-picoApp_apple.a */; };
-		509F50972696F36600F5671E /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 502497B12696DD12002ABD3E /* main.jsbundle */; };
 		618C4F18BE314428B7DA4DD7 /* godoRounded R.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4B4D9612647343BBB42E0003 /* godoRounded R.ttf */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		87C059926BFD42E0AB1D84C7 /* NotoSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5C111621CCC84A4E8748C485 /* NotoSans-Bold.ttf */; };
@@ -58,6 +59,9 @@
 		00E356EE1AD99517003FC87E /* picoApp_appleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = picoApp_appleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* picoApp_appleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = picoApp_appleTests.m; sourceTree = "<group>"; };
+		0C0A6C79284BB88C00FDF196 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
+		0C62DF00284F722F00665552 /* Wifi.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Wifi.m; sourceTree = "<group>"; };
+		0C62DF02284F738F00665552 /* Wifi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Wifi.h; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* picoApp_apple.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = picoApp_apple.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = picoApp_apple/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = picoApp_apple/AppDelegate.m; sourceTree = "<group>"; };
@@ -74,7 +78,6 @@
 		2D02E4901E0B4A5D006451C7 /* picoApp_apple-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "picoApp_apple-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4457DDAF60C223287F87AE4F /* libPods-picoApp_apple-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-picoApp_apple-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B4D9612647343BBB42E0003 /* godoRounded R.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "godoRounded R.ttf"; path = "../Assets/fonts/godoRounded R.ttf"; sourceTree = "<group>"; };
-		502497B12696DD12002ABD3E /* main.jsbundle */ = {isa = PBXFileReference; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
 		5C111621CCC84A4E8748C485 /* NotoSans-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NotoSans-Bold.ttf"; path = "../Assets/fonts/NotoSans-Bold.ttf"; sourceTree = "<group>"; };
 		65596E9E6FF72DDAD927C8BC /* Pods-picoApp_apple.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-picoApp_apple.release.xcconfig"; path = "Target Support Files/Pods-picoApp_apple/Pods-picoApp_apple.release.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = picoApp_apple/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -108,6 +111,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4C989CB52D7A1711CE928C5A /* libPods-picoApp_apple.a in Frameworks */,
+				0C0A6C7A284BB88C00FDF196 /* NetworkExtension.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -158,6 +162,8 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				0C62DF00284F722F00665552 /* Wifi.m */,
+				0C62DF02284F738F00665552 /* Wifi.h */,
 			);
 			name = picoApp_apple;
 			sourceTree = "<group>";
@@ -180,6 +186,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				0C0A6C79284BB88C00FDF196 /* NetworkExtension.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				B05D2C0D52DC056ACBAEEDA4 /* libPods-picoApp_apple.a */,
 				AD37BD08320076312B0D3C77 /* libPods-picoApp_apple-picoApp_appleTests.a */,
@@ -199,7 +206,6 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				502497B12696DD12002ABD3E /* main.jsbundle */,
 				168AA7832567565C007E0F7A /* GoogleService-Info.plist */,
 				168AA6872566B385007E0F7A /* File.swift */,
 				13B07FAE1A68108700A75B9A /* picoApp_apple */,
@@ -387,7 +393,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				509F50972696F36600F5671E /* main.jsbundle in Resources */,
 				168AA7842567565C007E0F7A /* GoogleService-Info.plist in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
@@ -429,7 +434,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
+			shellScript = "export NODE_BINARY=/opt/homebrew/bin/node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
 		0D57F1D45AE17E9E058CE227 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -664,6 +669,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C62DF01284F722F00665552 /* Wifi.m in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				168AA6882566B385007E0F7A /* File.swift in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
@@ -774,20 +780,21 @@
 				CODE_SIGN_ENTITLEMENTS = picoApp_apple/picoApp_appleDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 15;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 62W9S77336;
 				ENABLE_BITCODE = NO;
+				EXCLUDED_ARCHS = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = picoApp_apple/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.0.16;
+				MARKETING_VERSION = 3.0.17;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -812,19 +819,20 @@
 				CODE_SIGN_ENTITLEMENTS = picoApp_apple/picoApp_apple.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 15;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 62W9S77336;
+				EXCLUDED_ARCHS = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = picoApp_apple/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.0.16;
+				MARKETING_VERSION = 3.0.17;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1000,6 +1008,8 @@
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				EXCLUDED_ARCHS = "";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -1015,7 +1025,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
 					"$(inherited)",
@@ -1064,6 +1074,8 @@
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				EXCLUDED_ARCHS = "";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -1072,7 +1084,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
 					"$(inherited)",

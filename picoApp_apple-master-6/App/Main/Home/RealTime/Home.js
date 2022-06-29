@@ -12,6 +12,7 @@ import {
   Linking
 } from 'react-native';
 import {
+  AuthContext,
   UserContext,
   DeviceAndAirInfoContext,
   TempContext,
@@ -21,12 +22,16 @@ import {
   OnlineContext,
   LocaleContext,
 } from '../../../context';
+import useCheckFirmwareVersion from '../../../src/hook/useCheckFirmwareVersion';
 import LinearGradient from 'react-native-linear-gradient';
 import BitSwiper from 'react-native-bit-swiper';
 import Geolocation from '@react-native-community/geolocation';
 import Geocoder from 'react-native-geocoding';
 import Modal from 'react-native-modal';
 import colors from '../../../src/colors';
+import cal from '../../../src/calculate';
+import cnt from '../../../src/constant';
+import {useStateCallbackAfter500} from '../../../src/hook/useStateCallback';
 
 export const Home = ({navigation}) => {
   const strings = useContext(LanguageContext);
@@ -39,31 +44,57 @@ export const Home = ({navigation}) => {
 
   const devices = useContext(DeviceContext);
   const deviceAndAirInfo = useContext(DeviceAndAirInfoContext);
+  // const deviceAndAirInfo = [
+  //   {stateInfo: {"co2": 464, "humid": 53, "Lat": "", "Lng": "", "pm10": 7, "pm25": 10, "ReportTime": "20220613125200", "Temperature": "27.4", "vocs": 11, "dataType": "M", "ip": "172.30.1.9", "myreport": "2022-06-13 21:52:00", "serialNum": "AC67B25CC392"}},
+  //   {stateInfo: {"co2": 464, "humid": 53, "Lat": "", "Lng": "", "pm10": 7, "pm25": 10, "ReportTime": "20220613125200", "Temperature": "27.4", "vocs": 11, "dataType": "M", "ip": "172.30.1.9", "myreport": "2022-06-13 21:52:00", "serialNum": "AC67B25CC392"}},
+  // ]
   const snapShotAndCount = useContext(SnapShotAndCountContext);
   const tempMod = useContext(TempContext);
   const userInfo = useContext(UserContext);
-  const [connectInfo, setConnectInfo]=useState(false);
-
+  const { signOut } = useContext(AuthContext);
+  
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
   const [addressName, setAddressName] = useState('-');
-
+  
   const [date, setDate] = useState(new Date());
   const [amPm, setAmPm] = useState('AM');
   const [publicAirInfo, setPublicAirInfo] = useState(null);
-
+  
   const [publicStateInfo, setPublicStateInfo] = useState(null);
   const [publicPm25, setPublicPm25] = useState(0);
   const [publicPm10, setPublicPm10] = useState(0);
   const [publicO3, setPublicO3] = useState(0);
   const [publicPollenTree, setPublicPollenTree] = useState(0);
   const [publicPollenWeed, setPublicPollenWeed] = useState(0);
-
+  
   const [isLoading, setIsLoading] = useState(false);
   const [pollenExplain, setPollenEx] = useState(false);
   const [isOffLine, setIsOffLine] = useState(false);
-
   
+  const [connectInfo, setConnectInfo]= useStateCallbackAfter500(false);
+  const [isFirmwareUpdate, setIsFirmwareUpdate] = useStateCallbackAfter500(false);
+  const [isForcedLogout, setIsForcedLogout] = useStateCallbackAfter500(false);
+  
+  const [getLatestFirmwareVersion, getDeviceFirmwareVersion, compareVersion] = useCheckFirmwareVersion()
+
+  const compareFirmwareVersion = async (id) => {
+    const latestVersion = await getLatestFirmwareVersion(id)
+    const version = await getDeviceFirmwareVersion(id)
+    return compareVersion(latestVersion, version)
+  }
+  const isShowFirmwareUpdate = async () => {
+    let isNeedFirmwareUpdate = false
+
+    for(let i = 0; i < devices.length; i++) {
+      isNeedFirmwareUpdate = await compareFirmwareVersion(i)    
+      if (isNeedFirmwareUpdate)
+        break;
+    }
+
+    setIsFirmwareUpdate(isNeedFirmwareUpdate)
+  }
+
   function open_WhatsApp() {
  
     Linking.openURL("https://apps.apple.com/kr/app/picohome/id1330540218");
@@ -132,55 +163,53 @@ export const Home = ({navigation}) => {
    */
 
   // Background color값 반환
-  const getBackgroundState = (props) => {
-    if (0 <= props && props <= 15) {
+  const getBackgroundState = value => {
+    if (cal.boundaryPM25(value) === cnt.PM25_GOOD)
       return 'rgba(0, 172, 255, 0.3)';
-    } else if (16 <= props && props <= 35) {
+    else if (cal.boundaryPM25(value) === cnt.PM25_MOD)
       return 'rgba(121, 191, 0, 0.3)';
-    } else if (36 <= props && props <= 75) {
+    else if (cal.boundaryPM25(value) === cnt.PM25_BAD)
       return 'rgba(255, 160, 64, 0.3)';
-    } else {
+    else if (cal.boundaryPM25(value) === cnt.PM25_VERY_BAD)
       return 'rgba(252, 83, 69, 0.3)';
-    }
+    
+    return 'rgba(252, 83, 69, 0.3)';
   };
 
   // Background Layer1의 color에 해당하는 이미지 반환
-  const getBackWaveLayerState1 = (props) => {
-    if (0 <= props && props <= 15) {
+  const getBackWaveLayerState1 = value => {
+    if (cal.boundaryPM25(value) === cnt.PM25_GOOD)
       return require('../../../../Assets/img/waveLayerGood1.png');
-    } else if (16 <= props && props <= 35) {
+    else if (cal.boundaryPM25(value) === cnt.PM25_MOD)
       return require('../../../../Assets/img/waveLayerModerate1.png');
-    } else if (36 <= props && props <= 75) {
+    else if (cal.boundaryPM25(value) === cnt.PM25_BAD)
       return require('../../../../Assets/img/waveLayerBad1.png');
-    } else {
+    else if (cal.boundaryPM25(value) === cnt.PM25_VERY_BAD)
       return require('../../../../Assets/img/waveLayerVeryBad1.png');
-    }
   };
 
   // Background Layer2의 color에 해당하는 이미지 반환
-  const getBackWaveLayerState2 = (props) => {
-    if (0 <= props && props <= 15) {
+  const getBackWaveLayerState2 = value => {
+    if (cal.boundaryPM25(value) === cnt.PM25_GOOD)
       return require('../../../../Assets/img/waveLayerGood2.png');
-    } else if (16 <= props && props <= 35) {
+    else if (cal.boundaryPM25(value) === cnt.PM25_MOD)
       return require('../../../../Assets/img/waveLayerModerate2.png');
-    } else if (36 <= props && props <= 75) {
+    else if (cal.boundaryPM25(value) === cnt.PM25_BAD)
       return require('../../../../Assets/img/waveLayerBad2.png');
-    } else {
+    else if (cal.boundaryPM25(value) === cnt.PM25_VERY_BAD)
       return require('../../../../Assets/img/waveLayerVeryBad2.png');
-    }
-  };
+  }
 
   // public Pm25의 color값 반환
-  const getPublicPm25TextColor = (props) => {
-    if (0 <= props && props <= 15) {
-      return {color: colors.azure};
-    } else if (16 <= props && props <= 35) {
-      return {color: colors.darkLimeGreen};
-    } else if (36 <= props && props <= 75) {
-      return {color: colors.lightOrange};
-    } else {
-      return {color: colors.coral};
-    }
+  const getPublicPm25TextColor = value => {
+    if (cal.boundaryPM25(value) === cnt.PM25_GOOD)
+      return { color: colors.azure };
+    else if (cal.boundaryPM25(value) === cnt.PM25_MOD)
+      return { color: colors.darkLimeGreen };
+    else if (cal.boundaryPM25(value) === cnt.PM25_BAD)
+      return { color: colors.lightOrange };
+    else if (cal.boundaryPM25(value) === cnt.PM25_VERY_BAD)
+      return { color: colors.coral };
   };
 
   // public Pm10의 color값 반환
@@ -260,8 +289,10 @@ export const Home = ({navigation}) => {
     )
       .then((response) => response.json())
       .then((res) => {
-        //console.log(res);
-        setPublicAirInfo(res);
+        if (res.Status === 'ERROR' && res.Msg === 'err_invalid_api_key')
+          setIsForcedLogout(true)
+        else
+          setPublicAirInfo(res)
       })
       .catch((error) => {
         //console.error(error);
@@ -269,47 +300,46 @@ export const Home = ({navigation}) => {
   }
 
   // Device의 Pm25 측정 값 상태 반환
-  const getHomeState = (props) => {
-    if (0 <= props && props <= 15) {
+  const getHomeState = value => {
+    if (cal.boundaryPM25(value) === cnt.PM25_GOOD)
       return strings.main_state_good;
-    } else if (16 <= props && props <= 35) {
+    else if (cal.boundaryPM25(value) === cnt.PM25_MOD)
       return strings.main_state_moderate;
-    } else if (36 <= props && props <= 75) {
+    else if (cal.boundaryPM25(value) === cnt.PM25_BAD)
       return strings.main_state_poor;
-    } else {
+    else if (cal.boundaryPM25(value) === cnt.PM25_VERY_BAD)
       return strings.main_state_verypoor;
-    }
   };
 
   // Device의 Pm25 측정 값에 해당하는 Device Background 이미지 반환
-  const getHomeSource = (props) => {
-    if (0 <= props && props <= 15) {
+  const getHomeSource = value => {
+    if (cal.boundaryPM25(value) === cnt.PM25_GOOD)
       return require('../../../../Assets/img/imgHouseBlue.png');
-    } else if (16 <= props && props <= 35) {
+    else if (cal.boundaryPM25(value) === cnt.PM25_MOD)
       return require('../../../../Assets/img/imgHouseGreen.png');
-    } else if (36 <= props && props <= 75) {
+    else if (cal.boundaryPM25(value) === cnt.PM25_BAD)
       return require('../../../../Assets/img/imgHouseOrange.png');
-    } else {
+    else if (cal.boundaryPM25(value) === cnt.PM25_VERY_BAD)
       return require('../../../../Assets/img/imgHouseRed.png');
-    }
   };
 
   // Device의 Pm25 측정 값에 해당하는 Picohome 이미지 반환
-  const getPicoHomeSource = (props) => {
-    if (0 <= props && props <= 15) {
+  const getPicoHomeSource = value => {
+    if (cal.boundaryPM25(value) === cnt.PM25_GOOD)
       return require('../../../../Assets/img/imgPicohomeGood.png');
-    } else if (16 <= props && props <= 35) {
+    else if (cal.boundaryPM25(value) === cnt.PM25_MOD)
       return require('../../../../Assets/img/imgPicohomeModerate.png');
-    } else if (36 <= props && props <= 75) {
+    else if (cal.boundaryPM25(value) === cnt.PM25_BAD)
       return require('../../../../Assets/img/imgPicohomeBad.png');
-    } else {
+    else if (cal.boundaryPM25(value) === cnt.PM25_VERY_BAD)
       return require('../../../../Assets/img/imgPicohomeVerybad.png');
-    }
   };
 
   // 현재 위치의 위도(latitude), 경도(longitude)값 설정
   // 현재 위치의 위,경도를 기준으로 Temperature/Humid/Ozone 설정
   useEffect(() => {
+    isShowFirmwareUpdate()
+
     Geolocation.getCurrentPosition((position) => {
       setLatitude(position.coords.latitude);
       setLongitude(position.coords.longitude);
@@ -359,11 +389,11 @@ export const Home = ({navigation}) => {
   // 내부의 Pm25/Pm10/Ozone값을 각각 설정
   useEffect(() => {
     try{
-      setPublicPm25(publicStateInfo.data.timelines[0].intervals[0].values.particulateMatter25);
-      setPublicPm10(publicStateInfo.data.timelines[0].intervals[0].values.particulateMatter10);
-      setPublicO3(publicStateInfo.data.timelines[0].intervals[0].values.pollutantO3);
-      setPublicPollenTree(publicStateInfo.data.timelines[0].intervals[0].values.treeIndex);
-      setPublicPollenWeed(publicStateInfo.data.timelines[0].intervals[0].values.weedIndex);
+      setPublicPm25(publicStateInfo?.data?.timelines[0]?.intervals[0]?.values?.particulateMatter25 || 0);
+      setPublicPm10(publicStateInfo?.data?.timelines[0]?.intervals[0]?.values?.particulateMatter10 || 0);
+      setPublicO3(publicStateInfo?.data?.timelines[0]?.intervals[0]?.values?.pollutantO3 || 0);
+      setPublicPollenTree(publicStateInfo?.data?.timelines[0]?.intervals[0]?.values?.treeIndex || 0);
+      setPublicPollenWeed(publicStateInfo?.data?.timelines[0]?.intervals[0]?.values?.weedIndex || 0);
     }catch(exception){
       setPublicPm25(0);
       setPublicPm10(0);
@@ -403,7 +433,7 @@ export const Home = ({navigation}) => {
           //console.log(res);
           //console.log(res.version);
 
-        if(res.version != "3.0.16"){
+        if(res.version != "3.0.17"){
           //console.log("different version");
           setConnectInfo(true);
         }else{
@@ -473,30 +503,58 @@ export const Home = ({navigation}) => {
           <View style={styles.locationInfoStyle}>
             <View style={styles.locationDateTime}>
               <View style={styles.dateStyle}>
-                <Text style={styles.dateText}>{monthAndDay()}</Text>
+                <Text
+                  style={styles.dateText}
+                  allowFontScaling={false}
+                >
+                  {monthAndDay()}
+                </Text>
               </View>
               <View style={styles.divider}></View>
               <View style={styles.timeStyle}>
-                <Text style={styles.timeText}>{amPm}</Text>
-                <Text style={styles.timeText}> </Text>
-                <Text style={styles.timeText}>
+                <Text
+                  style={styles.timeText}
+                  allowFontScaling={false}
+                >
+                  {amPm}
+                </Text>
+                <Text
+                  style={styles.timeText}
+                  allowFontScaling={false}
+                >
                   {leadingZeros(date.getHours(), 2)}
                 </Text>
-                <Text style={styles.timeText}>{':'}</Text>
-                <Text style={styles.timeText}>
+                <Text
+                  style={styles.timeText}
+                  allowFontScaling={false}
+                >
+                  {':'}
+                </Text>
+                <Text
+                  style={styles.timeText}
+                  allowFontScaling={false}
+                >
                   {leadingZeros(date.getMinutes(), 2)}
                 </Text>
               </View>
             </View>
             <View style={styles.locationPlaceStyle}>
-              <Text style={styles.locationPlaceTextStyle}>{addressName}</Text>
+              <Text
+                style={styles.locationPlaceTextStyle}
+                allowFontScaling={false}
+              >
+                {addressName}
+              </Text>
               <Image
                 style={{marginLeft: 4}}
                 source={require('../../../../Assets/img/icMap.png')}
               />
             </View>
             <View style={styles.tempAndHumidityStyle}>
-              <Text style={styles.temp}>
+              <Text
+                style={styles.temp}
+                allowFontScaling={false}
+              >
                 {publicAirInfo != null
                   ? tempMod
                     ? parseInt(
@@ -505,60 +563,98 @@ export const Home = ({navigation}) => {
                     : parseInt(publicAirInfo.Info.WeatherInfo.Temperature)
                   : '-'}
               </Text>
-              <Text style={styles.tempMod}>{tempMod ? '°F' : '°C'}</Text>
-              <Text style={styles.humidity}>
-                {publicAirInfo != null
-                  ? publicAirInfo.Info.WeatherInfo.Humid
-                  : '-'}
+              <Text
+                style={styles.tempMod}
+                allowFontScaling={false}
+              >
+                {tempMod ? '°F' : '°C'}
               </Text>
-              <Text style={styles.percent}>%</Text>
+              <Text
+                style={styles.humidity}
+                allowFontScaling={false}
+              >
+                {publicAirInfo ? publicAirInfo.Info.WeatherInfo.Humid : '-'}
+              </Text>
+              <Text
+                style={styles.percent}
+                allowFontScaling={false}
+              >
+                %
+              </Text>
             </View>
           </View>
           <View style={styles.stateStyle}>
             <View style={styles.stateViewStyle}>
-              <Text style={styles.pm25Style}>{strings.main_label_pm25}</Text>
+              <Text
+                style={styles.pm25Style}
+                allowFontScaling={false}
+              >
+                {strings.main_label_pm25}
+              </Text>
               <View style={styles.pm25StateViewStyle}>
                 <Text
-                  style={[
-                    styles.pm25Layer,
-                    getPublicPm25TextColor(parseInt(publicPm25)),
-                  ]}>
+                  style={[styles.pm25Layer, getPublicPm25TextColor(parseInt(publicPm25))]}
+                  allowFontScaling={false}
+                >
                   {parseInt(publicPm25)}
                 </Text>
-                <Text style={styles.pm25StateUnit}>
+                <Text
+                  style={styles.pm25StateUnit}
+                  allowFontScaling={false}
+                >
                   {strings.main_label_pm_unit}
                 </Text>
               </View>
             </View>
             <View style={styles.stateViewStyle}>
-              <Text style={styles.pm10Style}>{strings.main_label_pm10}</Text>
+              <Text
+                style={styles.pm10Style}
+                allowFontScaling={false}
+              >
+                {strings.main_label_pm10}
+              </Text>
               <View style={styles.pm10StateViewStyle}>
                 <Text
-                  style={[
-                    styles.pm10Layer,
-                    getPublicPm10TextColor(parseInt(publicPm10)),
-                  ]}>
+                  style={[styles.pm10Layer, getPublicPm10TextColor(parseInt(publicPm10))]}
+                  allowFontScaling={false}
+                >
                   {parseInt(publicPm10)}
                 </Text>
-                <Text style={styles.pm10StateUnit}>
+                <Text
+                  style={styles.pm10StateUnit}
+                  allowFontScaling={false}
+                >
                   {strings.main_label_pm_unit}
                 </Text>
               </View>
             </View>
             <View style={styles.stateViewStyle}>
-              <Text style={styles.ozoneStyle}>{strings.main_label_ozone}</Text>
+              <Text
+                style={styles.ozoneStyle}
+                allowFontScaling={false}
+              >
+                {strings.main_label_ozone}
+              </Text>
               <View style={styles.ozoneViewStyle}>
                 <Text
-                  style={[styles.ozoneLayer, getPublicO3TextColor(publicO3)]}>
+                  style={[styles.ozoneLayer, getPublicO3TextColor(publicO3)]}
+                  allowFontScaling={false}
+                >
                   {parseInt(publicO3)}
                 </Text>
-                <Text style={styles.ozoneStateUnit}>
+                <Text
+                  style={styles.ozoneStateUnit}
+                  allowFontScaling={false}
+                >
                   {strings.main_label_ppb}
                 </Text>
               </View>
             </View>
             <View style={styles.stateViewStyle}>
-              <Text style={styles.pollenStyle}>
+            <Text
+                style={styles.pollenStyle}
+                allowFontScaling={false}
+              >
                 {strings.main_label_pollen}
               </Text>
               <View style={styles.pollenViewStyle}>
@@ -566,28 +662,32 @@ export const Home = ({navigation}) => {
                   <Text style={styles.pollenText}>-</Text>
                 ) : (
                   <Text
-                    style={[
-                      styles.pollenLayer,
-                      getPublicPollenTreeTextColor(publicPollenTree),
-                    ]}>
+                    style={[styles.pollenLayer, getPublicPollenTreeTextColor(publicPollenTree)]}
+                    allowFontScaling={false}
+                  >
                     {publicPollenTree.toString()}
                   </Text>
                 )}
-                <Text style={[styles.pollenStateUnit, {marginRight: 2}]}>
+                <Text
+                  style={[styles.pollenStateUnit, { marginRight: 2 }]}
+                  allowFontScaling={false}
+                >
                   /
                 </Text>
                 {publicPollenWeed === null ? (
                   <Text style={styles.pollenText}>-</Text>
                 ) : (
                   <Text
-                    style={[
-                      styles.pollenLayer,
-                      getPublicPollenWeedTextColor(publicPollenWeed),
-                    ]}>
+                    style={[styles.pollenLayer, getPublicPollenWeedTextColor(publicPollenWeed)]}
+                    allowFontScaling={false}
+                  >
                     {publicPollenWeed.toString()}
                   </Text>
                 )}
-                <Text style={styles.pollenStateUnit}>
+                <Text
+                  style={styles.pollenStateUnit}
+                  allowFontScaling={false}
+                >
                   {strings.main_label_index}
                 </Text>
               </View>
@@ -651,10 +751,14 @@ export const Home = ({navigation}) => {
             <View style={styles.viewBox}>
               <ImageBackground
                 source={require('../../../../Assets/img/imgHouseBgShadow.png')}
-                style={styles.whiteBox}>
+                style={styles.whiteBox}
+                imageStyle={{resizeMode: 'stretch'}}
+              >
                 <ImageBackground
                   source={require('../../../../Assets/img/imgHouseGrey.png')}
-                  style={styles.stateBox}>
+                  style={styles.stateBox}
+                  imageStyle={{resizeMode: 'stretch'}}
+                >
                   <Image
                     source={require('../../../../Assets/img/imgPicohomeOff.png')}
                     style={styles.picoOff}
@@ -730,14 +834,19 @@ export const Home = ({navigation}) => {
                   onItemRender={(item, index) => (
                     <View key={index} style={styles.swiperBox}>
                       {snapShotAndCount.length === deviceAndAirInfo.length ? (
-                        snapShotAndCount[index].c >= 5 ? (
+                        // snapShotAndCount[index].c >= 5 ? (
+                        isNaN(item.stateInfo.co2) ? (
                           <View>
                             <ImageBackground
                               source={require('../../../../Assets/img/imgHouseBgShadow.png')}
-                              style={styles.whiteBox}>
+                              style={styles.whiteBox}
+                              imageStyle={{resizeMode: 'stretch'}}
+                            >
                               <ImageBackground
                                 source={require('../../../../Assets/img/imgHouseGrey.png')}
-                                style={styles.stateBox}>
+                                style={styles.stateBox}
+                                imageStyle={{resizeMode: 'stretch'}}
+                              >
                                 <Image
                                   source={require('../../../../Assets/img/imgPicohomeOff.png')}
                                   style={styles.picoOff}
@@ -798,7 +907,9 @@ export const Home = ({navigation}) => {
                             }>
                             <ImageBackground
                               source={require('../../../../Assets/img/imgHouseBgShadow.png')}
-                              style={styles.whiteBox}>
+                              style={styles.whiteBox}
+                              imageStyle={{resizeMode: 'stretch'}}
+                            >
                               <ImageBackground
                                 source={getHomeSource(item.stateInfo.pm25)}
                                 style={
@@ -807,7 +918,9 @@ export const Home = ({navigation}) => {
                                   // 고정 크기를 이용하면 크게 상관은 없지만
                                   // 어떤 핸드폰에서는 PiCO Home이 지나치게 작아 보일 수 있다.
                                   styles.stateBox
-                                }>
+                                }
+                                imageStyle={{resizeMode: 'stretch'}}
+                              >
                                 <Image
                                   source={getPicoHomeSource(
                                     item.stateInfo.pm25,
@@ -829,111 +942,148 @@ export const Home = ({navigation}) => {
                                     />
                                   </TouchableOpacity>
                                 </View>
-                                <Text style={styles.picoName}>
+                                <Text
+                                  style={styles.picoName}
+                                  allowFontScaling={false}
+                                >
                                   {item.PicoName}
                                 </Text>
-                                <Text style={styles.picoPlace}>
+                                <Text
+                                  style={styles.picoPlace}
+                                  allowFontScaling={false}
+                                >
                                   {item.Description}
                                 </Text>
-                                <Text style={styles.picoHomeState}>
+                                <Text
+                                  style={styles.picoHomeState}
+                                  allowFontScaling={false}
+                                >
                                   {getHomeState(item.stateInfo.pm25)}
                                 </Text>
                                 <View style={styles.picoTempAndHumdi}>
-                                  <Text style={styles.picoTemp}>
+                                <Text
+                                    style={styles.picoTemp}
+                                    allowFontScaling={false}
+                                  >
                                     {tempMod
-                                      ? Math.round(
-                                          (item.stateInfo.temp / 10.0) * 1.8 +
-                                            32,
-                                        )
-                                      : Math.round(item.stateInfo.temp / 10.0)}
+                                      ? Math.round((item.stateInfo.temp) * 1.8 + 32)
+                                      : Math.round(item.stateInfo.temp)}
                                   </Text>
-                                  <Text style={styles.picoTempUnit}>
+                                  <Text
+                                    style={styles.picoTempUnit}
+                                    allowFontScaling={false}
+                                  >
                                     {tempMod ? '°F' : '°C'}
                                   </Text>
                                   <Text>{'   '}</Text>
-                                  <Text style={styles.picoHumdi}>
-                                    {Math.round(item.stateInfo.humd / 10.0)}
+                                  <Text
+                                    style={styles.picoHumdi}
+                                    allowFontScaling={false}
+                                  >
+                                    {Math.round(item.stateInfo.humd)}
                                   </Text>
-                                  <Text style={styles.picoHumdiUnit}>%</Text>
+                                  <Text
+                                    style={styles.picoHumdiUnit}
+                                    allowFontScaling={false}
+                                  >
+                                    %
+                                  </Text>
                                 </View>
                                 <View style={styles.picoStateInfo}>
                                   <View style={styles.picoStatePm25Style}>
-                                    <View
-                                      style={{
-                                        height: 30,
-                                        justifyContent: 'center',
-                                      }}>
-                                      <Text style={styles.picoStatePm25Text}>
+                                  <View style={{ height: 45, justifyContent: 'center' }}>
+                                      <Text
+                                        style={styles.picoStatePm25Text}
+                                        allowFontScaling={false}
+                                      >
                                         {strings.main_label_pm25}
                                       </Text>
                                     </View>
-                                    <Image
-                                      source={require('../../../../Assets/img/icPm25.png')}
+                                    <Image 
+                                      source={require('../../../../Assets/img/icPm25.png')} 
                                     />
-                                    <Text style={styles.picoStatePm25}>
+                                    <Text
+                                      style={styles.picoStatePm25}
+                                      allowFontScaling={false}
+                                    >
                                       {item.stateInfo.pm25}
                                     </Text>
-                                    <Text style={styles.picoStatePm25Unit}>
+                                    <Text
+                                      style={styles.picoStatePm25Unit}
+                                      allowFontScaling={false}
+                                    >
                                       {strings.main_label_pm_unit}
                                     </Text>
                                   </View>
                                   <View style={styles.picoStatePm10Style}>
-                                    <View
-                                      style={{
-                                        height: 30,
-                                        justifyContent: 'center',
-                                      }}>
-                                      <Text style={styles.picoStatePm10Text}>
+                                    <View style={{ height: 45, justifyContent: 'center' }}>
+                                      <Text
+                                        style={styles.picoStatePm10Text}
+                                        allowFontScaling={false}
+                                      >
                                         {strings.main_label_pm10}
                                       </Text>
                                     </View>
-                                    <Image
-                                      source={require('../../../../Assets/img/icPm10.png')}
-                                    />
-                                    <Text style={styles.picoStatePm10}>
+                                    <Image source={require('../../../../Assets/img/icPm10.png')} />
+                                    <Text
+                                      style={styles.picoStatePm10}
+                                      allowFontScaling={false}
+                                    >
                                       {item.stateInfo.pm10}
                                     </Text>
-                                    <Text style={styles.picoStatePm10Unit}>
+                                    <Text
+                                      style={styles.picoStatePm10Unit}
+                                      allowFontScaling={false}
+                                    >
                                       {strings.main_label_pm_unit}
                                     </Text>
                                   </View>
                                   <View style={styles.picoStateVOCStyle}>
-                                    <View
-                                      style={{
-                                        height: 30,
-                                        justifyContent: 'center',
-                                      }}>
-                                      <Text style={styles.picoStateVOCText}>
+                                    <View style={{ height: 45, justifyContent: 'center' }}>
+                                      <Text
+                                        style={[
+                                          styles.picoStateVOCText,
+                                          strings.getLanguage() !== 'en_US' && { marginBottom: 15 }
+                                        ]}
+                                        allowFontScaling={false}
+                                      >
                                         {strings.main_label_vocs}
                                       </Text>
                                     </View>
-                                    <Image
-                                      source={require('../../../../Assets/img/icVoc.png')}
-                                    />
-                                    <Text style={styles.picoStateVOC}>
+                                    <Image source={require('../../../../Assets/img/icVoc.png')} />
+                                    <Text
+                                      style={styles.picoStateVOC}
+                                      allowFontScaling={false}
+                                    >
                                       {item.stateInfo.vocs}
                                     </Text>
-                                    <Text style={styles.picoStateVOCUnit}>
+                                    <Text
+                                      style={styles.picoStateVOCUnit}
+                                      allowFontScaling={false}
+                                    >
                                       {strings.main_label_ppb}
                                     </Text>
                                   </View>
                                   <View style={styles.picoStateCO2Style}>
-                                    <View
-                                      style={{
-                                        height: 30,
-                                        justifyContent: 'center',
-                                      }}>
-                                      <Text style={styles.picoStateCO2Text}>
+                                    <View style={{ height: 45, justifyContent: 'center' }}>
+                                      <Text
+                                        style={styles.picoStateCO2Text}
+                                        allowFontScaling={false}
+                                      >
                                         {strings.scan_label_co2}
                                       </Text>
                                     </View>
-                                    <Image
-                                      source={require('../../../../Assets/img/icCo2.png')}
-                                    />
-                                    <Text style={styles.picoStateCO2}>
+                                    <Image source={require('../../../../Assets/img/icCo2.png')} />
+                                    <Text
+                                      style={styles.picoStateCO2}
+                                      allowFontScaling={false}
+                                    >
                                       {item.stateInfo.co2}
                                     </Text>
-                                    <Text style={styles.picoStateCO2Unit}>
+                                    <Text
+                                      style={styles.picoStateCO2Unit}
+                                      allowFontScaling={false}
+                                    >
                                       {strings.main_label_ppm}
                                     </Text>
                                   </View>
@@ -979,7 +1129,19 @@ export const Home = ({navigation}) => {
           <ActivityIndicator size="large" color={colors.azure} />
         </View>
       )}
-    <Modal isVisible={connectInfo} onBackdropPress={() => setConnectInfo(false)}>
+    <Modal 
+      isVisible={connectInfo} 
+      onBackdropPress={() => setConnectInfo(false)}
+      onModalHide={() => {
+        // 모달 여러개를 띄우기 위해 modal 값을 토글 함
+        if (isFirmwareUpdate) {
+          setIsFirmwareUpdate(false, () => setIsFirmwareUpdate(true));
+        } else if (isForcedLogout) {
+          setIsForcedLogout(false, () => setIsForcedLogout(true));
+        }
+      }}
+      style={{zIndex: 1}}
+    >
         <View style={styles.modalContainer}>
           <View style={styles.modalCancel}>
             <TouchableOpacity onPress={() => setConnectInfo(false)}>
@@ -1000,6 +1162,60 @@ export const Home = ({navigation}) => {
         </View>
       </Modal>
 
+      <Modal 
+        isVisible={isFirmwareUpdate} 
+        onBackdropPress={() => setIsFirmwareUpdate(false)}
+        onModalHide={() => {
+          // 모달 여러개를 띄우기 위해 modal 값을 토글 함
+          if (connectInfo) {
+            setConnectInfo(false, () => setConnectInfo(true));
+          } else if (isForcedLogout) {
+            setIsForcedLogout(false, () => setIsForcedLogout(true));
+          }
+        }}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalCancel}>
+            <TouchableOpacity onPress={() => setIsFirmwareUpdate(false)}>
+              <Image source={require('../../../../Assets/img/icCancel.png')} />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.modalHeaderTextView}>
+            <Text style={styles.modalHeaderText}>{strings.popup_firmwareupdate_title}</Text>
+          </View>
+          <View style={styles.modalSubTextView}>
+            <Text style={styles.modalSubTextNotCenter}>{strings.popup_firmwareupdate_contents}</Text>
+          </View>
+          <TouchableOpacity onPress={() => setIsFirmwareUpdate(false)}>
+            <View style={[styles.modalButton, { width: width * 0.8 }]}>
+              <Text style={styles.modalButtonText}>{strings.main_popup_pollen_button_ok}</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+
+      <Modal 
+        isVisible={isForcedLogout}
+        onModalHide={() => {
+          // 모달 여러개를 띄우기 위해 modal 값을 토글 함
+          if (connectInfo) {
+            setConnectInfo(false, () => setConnectInfo(true), 500);
+          } else if (isFirmwareUpdate) {
+            setIsFirmwareUpdate(false, () => setIsFirmwareUpdate(true), 500);
+          }
+        }}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalSubTextView}>
+            <Text style={styles.modalSubText}>{strings.popup_auto_logout_contents}</Text>
+          </View>
+          <TouchableOpacity onPress={() => signOut()}>
+            <View style={[styles.modalButton, { width: width * 0.8 }]}>
+              <Text style={styles.modalButtonText}>{strings.popup_button_ok}</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -1146,7 +1362,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
   },
   stateViewStyle: {
-    width: width * 0.156,
     height: width * 0.156,
     margin: width * 0.0312,
     alignItems: 'center',
@@ -1155,7 +1370,8 @@ const styles = StyleSheet.create({
   pm25Style: {
     textAlign: 'center',
     fontFamily: 'NotoSans',
-    fontSize: 11,
+    fontSize: 13.75,
+    marginBottom: 3,
     color: colors.blueGrey,
   },
   pm25StateViewStyle: {
@@ -1166,7 +1382,7 @@ const styles = StyleSheet.create({
     fontFamily: 'glogo',
     fontWeight: '800',
     fontStyle: 'normal',
-    fontSize: 30,
+    fontSize: 32,
     lineHeight: 30,
   },
   pm25StateUnit: {
@@ -1183,7 +1399,8 @@ const styles = StyleSheet.create({
     fontFamily: 'NotoSans',
     fontWeight: 'normal',
     fontStyle: 'normal',
-    fontSize: 11,
+    fontSize: 13.75,
+    marginBottom: 3,
     color: colors.blueGrey,
   },
   pm10StateViewStyle: {
@@ -1194,7 +1411,7 @@ const styles = StyleSheet.create({
     fontFamily: 'glogo',
     fontWeight: '800',
     fontStyle: 'normal',
-    fontSize: 30,
+    fontSize: 32,
     lineHeight: 30,
   },
   pm10StateUnit: {
@@ -1211,7 +1428,8 @@ const styles = StyleSheet.create({
     fontFamily: 'NotoSans',
     fontWeight: 'normal',
     fontStyle: 'normal',
-    fontSize: 11,
+    fontSize: 13.75,
+    marginBottom: 3,
     color: colors.blueGrey,
   },
   ozoneViewStyle: {
@@ -1222,7 +1440,7 @@ const styles = StyleSheet.create({
     fontFamily: 'glogo',
     fontWeight: '800',
     fontStyle: 'normal',
-    fontSize: 30,
+    fontSize: 32,
     lineHeight: 30,
   },
   ozoneStateUnit: {
@@ -1239,7 +1457,8 @@ const styles = StyleSheet.create({
     fontFamily: 'NotoSans',
     fontWeight: 'normal',
     fontStyle: 'normal',
-    fontSize: 11,
+    fontSize: 13.75,
+    marginBottom: 3,
     color: colors.blueGrey,
   },
   pollenViewStyle: {
@@ -1257,7 +1476,7 @@ const styles = StyleSheet.create({
     fontFamily: 'glogo',
     fontWeight: '800',
     fontStyle: 'normal',
-    fontSize: 30,
+    fontSize: 32,
     lineHeight: 30,
   },
   pollenStateUnit: {
@@ -1306,6 +1525,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.brownGrey,
   },
+  modalSubTextNotCenter: {
+    fontFamily: 'NotoSans',
+    fontSize: 13,
+    color: colors.brownGrey,
+  },
   modalButton: {
     width: width * 0.35,
     height: height * 0.07,
@@ -1332,7 +1556,7 @@ const styles = StyleSheet.create({
     color: colors.white,
   },
   viewBox: {
-    width: width * 0.85,
+    width: width * 0.9,
     alignItems: 'center',
   },
   picoHomeContainer: {
@@ -1361,8 +1585,8 @@ const styles = StyleSheet.create({
   },
   picoDeviceSetting: {
     position: 'absolute',
-    top: 70,
-    left: 215,
+    top: 80,
+    right: 5,
   },
   picoName: {
     textAlign: 'center',
@@ -1432,6 +1656,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     width: imageWidth,
     justifyContent: 'center',
+    alignItems: 'center',
   },
   picoOffInfo: {
     flexDirection: 'column',
@@ -1448,22 +1673,22 @@ const styles = StyleSheet.create({
   },
   picoStatePm25Style: {
     flexDirection: 'column',
-    margin: width * 0.015,
     alignItems: 'center',
   },
   picoStatePm25Text: {
     fontFamily: 'NotoSans',
     fontWeight: 'normal',
     fontStyle: 'normal',
-    fontSize: 10,
+    fontSize: 12,
     color: colors.white,
   },
   picoStatePm25: {
     fontFamily: 'glogo',
     fontWeight: '800',
     fontStyle: 'normal',
-    fontSize: 30,
+    fontSize: 32,
     lineHeight: 30,
+    marginTop: 5,
     color: colors.white,
   },
   picoStatePm25Unit: {
@@ -1473,22 +1698,23 @@ const styles = StyleSheet.create({
   },
   picoStatePm10Style: {
     flexDirection: 'column',
-    margin: width * 0.015,
+    marginLeft: width * 0.015,
     alignItems: 'center',
   },
   picoStatePm10Text: {
     fontFamily: 'NotoSans',
     fontWeight: 'normal',
     fontStyle: 'normal',
-    fontSize: 10,
+    fontSize: 12,
     color: colors.white,
   },
   picoStatePm10: {
     fontFamily: 'glogo',
     fontWeight: '800',
     fontStyle: 'normal',
-    fontSize: 30,
+    fontSize: 32,
     lineHeight: 30,
+    marginTop: 5,
     color: colors.white,
   },
   picoStatePm10Unit: {
@@ -1498,14 +1724,14 @@ const styles = StyleSheet.create({
   },
   picoStateVOCStyle: {
     flexDirection: 'column',
-    margin: width * 0.015,
+    marginLeft: width * 0.015,
     alignItems: 'center',
   },
   picoStateVOCText: {
     fontFamily: 'NotoSans',
     fontWeight: 'normal',
     fontStyle: 'normal',
-    fontSize: 10,
+    fontSize: 12,
     textAlign: 'center',
     color: colors.white,
   },
@@ -1513,8 +1739,9 @@ const styles = StyleSheet.create({
     fontFamily: 'glogo',
     fontWeight: '800',
     fontStyle: 'normal',
-    fontSize: 30,
+    fontSize: 32,
     lineHeight: 30,
+    marginTop: 5,
     color: colors.white,
   },
   picoStateVOCUnit: {
@@ -1524,22 +1751,23 @@ const styles = StyleSheet.create({
   },
   picoStateCO2Style: {
     flexDirection: 'column',
-    margin: width * 0.015,
+    marginLeft: width * 0.015,
     alignItems: 'center',
   },
   picoStateCO2Text: {
     fontFamily: 'NotoSans',
     fontWeight: 'normal',
     fontStyle: 'normal',
-    fontSize: 10,
+    fontSize: 12,
     color: colors.white,
   },
   picoStateCO2: {
     fontFamily: 'glogo',
     fontWeight: '800',
     fontStyle: 'normal',
-    fontSize: 30,
+    fontSize: 32,
     lineHeight: 30,
+    marginTop: 5,
     color: colors.white,
   },
   picoStateCO2Unit: {
@@ -1560,14 +1788,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.marineBlue,
   },
   whiteBox: {
-    width: width * 0.85,
-    height: width,
+    width: width * 0.96,
+    height: width * 1.0,
     alignItems: 'center',
   },
   stateBox: {
     position: 'absolute',
     top: 22,
-    width: width * 0.7,
+    width: width * 0.77,
     height: width * 0.81,
     alignItems: 'center',
   },

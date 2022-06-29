@@ -1,8 +1,8 @@
 export default {
   main_popup_title: '新しいバージョン',
   main_popup:'ピコホームのアプリに新しいバージョンがあります。アップデートしてください',
+  popup_auto_logout_contents: '他の機器からログアウトする場合は自動的にログアウトされます。 再度ログインして下さい。',
   main_popup_button: 'アップデート',
-
   onboarding_1_title: 'ようこそ、ピコホームへ。',
   onboarding_1_contents: 'あなたの周りの空気の質をご確認ください。',
   onboarding_1_button_skip: 'スキップ',
@@ -40,7 +40,9 @@ export default {
   signup_input_password: 'パスワード',
   signup_label_reenterpassword: 'パスワードの確認',
   signup_input_reenterpassword: 'パスワードの確認',
-  signup_terms: 'ピコホームの利用規約と個人情報保護方針に同意します。',
+  signup_terms_head: 'ピコホームの',
+  signup_terms: '利用規約と個人情報保護方針',
+  signup_terms_tail: 'に同意します。',
   signup_button_next: '次へ',
   signup_error_email: '正確なメールアドレスを入力してください。',
   signup_error_password:
@@ -155,9 +157,8 @@ export default {
   wifisetting_3_popup_label_network: 'ネットワークの名前',
   wifisetting_3_popup_label_password: 'パスワード',
   wifisetting_3_popup_input_password: 'パスワード',
-  wifisetting_3_popup_error_title: 'すみません',
-  wifisetting_3_popup_error:
-    '設定に失敗しました。パスワードまたはWi-Fi(2.4GHz)をご確認ください。',
+  wifisetting_3_popup_error_title: '設定に失敗しました。',
+  wifisetting_3_popup_error: `1。 パスワードまたはWi-Fi(2.4GHz)をご確認ください。\n2。紫色の点灯時はアップデート中です。少々お待ちください。電源が自動的にオフになったあと、電源を入れてWi-Fiを再設定してください。\n3。詳しい内容は 「ヘルプ」は「www.brilcom.com」でご確認下さい。`,
   wifisetting_3_popup_button_ok: '確認',
   wifisetting_4_title: 'ピコホームの設定',
   wifisetting_4_label_name: 'ピコホームの名前',
@@ -181,7 +182,7 @@ export default {
   details_graph_label_humidity: '湿度',
   details_graph_label_vocs: '揮発性有機化合物',
   details_graph_label_co2: '二酸化炭素',
-  details_subtitle_comfortzone: 'comfortzone',
+  details_subtitle_comfortzone: 'Comfort Zone',
   detail_tip_info_label_pm25: 'PM2.5',
   detail_tip_info_level_pm25_1: '0~15：いい／青色',
   detail_tip_info_level_pm25_2: '16~35：普通／緑色',
@@ -298,4 +299,9 @@ export default {
     'ピコホームをスキャンするために、モバイル機器でBluetooth機能をオンにしてください。', // 'ピコホームのアプリがブルートゥースの使用許可を求めています。',
   ble_permission_popup_button_allow: '許可',
   ble_permission_popup_button_deny: '許可しない',
+  wifi_publicwifi_connect:'連結',
+  popup_firmwareupdate_title: 'ファームウェアアップデート',
+  popup_firmwareupdate_contents: '新しいバージョンのソフトウェアがあります。より快適な使用のためにアップデートをしてください。\n\n1。ピコホームの電源を切ってから、もう一度電源を入れてください。\n2。 ピコホームが紫色のランプ点灯時は、アップデート中です。少々お待ちください。\n3。機器の電源が自動的に切られたら、電源ボタンを軽く押してピコホームの電源を入れてください。',
+  devicesetting_firmware_vesion_latest: '最新バージョン',
+  devicesetting_firmware_vesion_update: 'アップデート',
 };

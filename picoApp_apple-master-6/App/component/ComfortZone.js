@@ -6,10 +6,11 @@ import { Circle, Polygon, Text, G, Rect } from 'react-native-svg';
 import colors from '../src/colors';
 
 export const ComfortZone = (props) => {
+  const {temp: initialTemp = 0, humd: initialHumd = 0} = props
   const tempMod = useContext(TempContext);
   const Ydata = [0, 20, 40, 60, 80, 100];
   const Xdata = tempMod ? [59, 68, 77, 86, 95] : [15, 20, 25, 30, 35];
-
+  
   let summer = '';
   let winter = '';
 
@@ -19,8 +20,8 @@ export const ComfortZone = (props) => {
   const xAxisHeight = 50;
 
   const [date, setDate] = useState(new Date());
-  const [temp, setTemp] = useState((Math.round(props.temp / 10.0) - 15) * UCZWidth);
-  const [humd, setHumd] = useState((100 - Math.round(props.humd / 10.0)) * 2);
+  const [temp, setTemp] = useState((Math.round(initialTemp) - 15) * UCZWidth);
+  const [humd, setHumd] = useState((100 - Math.round(initialHumd)) * 2);
 
   winter =
     winter +
@@ -86,6 +87,7 @@ export const ComfortZone = (props) => {
         let c2 = -1.314 * temp + 55.279;
         let c3 = -6.343 * temp + 222.2175;
         let c4 = -37.5 * temp + 1032.3;
+        console.log({c1, c2, c3, c4});
         if (humd >= c1 && humd >= c2 && humd <= c3 && humd <= c4) {
           return colors.azure;
         } else {
@@ -124,12 +126,12 @@ export const ComfortZone = (props) => {
                 cx={temp}
                 cy={humd}
                 r={2}
-                fill={checkSeason(Math.round(props.temp / 10.0), Math.round(props.humd / 10.0))}
+                fill={checkSeason(Math.round(initialTemp), Math.round(initialHumd))}
               />
               <G>
                 <Rect
-                  x={temp + 10}
-                  y={humd - 15}
+                  x={temp - 40}
+                  y={humd + 10}
                   rx={5}
                   ry={5}
                   width={80}
@@ -138,11 +140,11 @@ export const ComfortZone = (props) => {
                   stroke={colors.veryLightPink}
                 />
                 <Text
-                  x={temp + 20}
-                  y={humd + 5}
-                  stroke={checkSeason(Math.round(props.temp / 10.0), Math.round(props.humd / 10.0))}>
-                  {tempMod ? Math.round((props.temp / 10.0) * 1.8 + 32) : Math.round(props.temp / 10.0)}
-                  {tempMod ? '°F' : '°C'} / {Math.round(props.humd / 10.0)}%
+                  x={temp - 30}
+                  y={humd + 30}
+                  stroke={checkSeason(Math.round(initialTemp), Math.round(initialHumd))}>
+                  {tempMod ? Math.round((initialTemp) * 1.8 + 32) : Math.round(initialTemp)}
+                  {tempMod ? '°F' : '°C'} / {Math.round(initialHumd)}%
                 </Text>
               </G>
               <Grid />
