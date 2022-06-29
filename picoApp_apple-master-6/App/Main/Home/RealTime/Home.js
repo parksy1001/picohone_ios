@@ -433,7 +433,7 @@ export const Home = ({navigation}) => {
           //console.log(res);
           //console.log(res.version);
 
-        if(res.version != "3.0.16"){
+        if(res.version != "3.0.17"){
           //console.log("different version");
           setConnectInfo(true);
         }else{

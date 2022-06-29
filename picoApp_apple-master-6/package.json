@@ -17,7 +17,7 @@
     "@react-native-community/geolocation": "2.0.2",
     "@react-native-community/google-signin": "5.0.0",
     "@react-native-community/masked-view": "0.1.10",
-    "@react-native-community/netinfo": "5.9.7",
+    "@react-native-community/netinfo": "9.0.0",
     "@react-native-firebase/app": "10.0.0",
     "@react-native-firebase/database": "10.0.0",
     "@react-native-firebase/messaging": "10.0.0",
@@ -31,7 +31,7 @@
     "react-native": "0.63.2",
     "react-native-base64": "0.1.0",
     "react-native-bit-swiper": "1.1.8",
-    "react-native-ble-plx": "2.0.1",
+    "react-native-ble-plx": "2.0.3",
     "react-native-cli": "^2.0.1",
     "react-native-fbsdk": "2.0.0",
     "react-native-fix-image": "^2.1.0",
@@ -50,7 +50,7 @@
     "react-native-tab-view": "2.15.2",
     "react-native-uuid": "1.4.9",
     "react-native-webview": "10.10.2",
-    "react-native-wifi-reborn": "4.3.3",
+    "react-native-wifi-reborn": "4.5.0",
     "react-navigation-stack": "2.10.1"
   },
   "devDependencies": {

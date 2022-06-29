@@ -1201,10 +1201,10 @@
   "resolved" "https://registry.npmjs.org/@react-native-community/masked-view/-/masked-view-0.1.10.tgz"
   "version" "0.1.10"
 
-"@react-native-community/netinfo@5.9.7":
-  "integrity" "sha512-NAkkT68oF+M9o6El2xeUqZK7magPjG/tAcEbvCbqyhlh3yElKWnI1e1vpbVvFXzTefy67FwYFWOJqBN6U7Mnkg=="
-  "resolved" "https://registry.npmjs.org/@react-native-community/netinfo/-/netinfo-5.9.7.tgz"
-  "version" "5.9.7"
+"@react-native-community/netinfo@9.0.0":
+  "integrity" "sha512-oodeVNdL0IT/Fv0cpL7CdxnnESNKiiAzf29yhvGSJBvuFmyHxvmYOtBIX27HWG9tQU8Yzeh+MyQcKBCNmkva+Q=="
+  "resolved" "https://registry.npmjs.org/@react-native-community/netinfo/-/netinfo-9.0.0.tgz"
+  "version" "9.0.0"
 
 "@react-native-firebase/app@10.0.0":
   "integrity" "sha512-hvmEOj3vMeaoYX8Q7f2UZCSVGv0VMvTR/RUUka0y7Xmyzg3kpdb2EHCOoqLIN9ySPf5b/At5I6GVazQugbZqLA=="
@@ -6475,10 +6475,10 @@
   dependencies:
     "prop-types" "^15.6.1"
 
-"react-native-ble-plx@2.0.1":
-  "integrity" "sha512-dd4IubwGu6CZoDMrZoSUb0zGmb/bSOXkB+5sYxKhaHANjem/9yPx6mifaLM13M+DJ6P+PNoLn0bPKItTYzsZiA=="
-  "resolved" "https://registry.npmjs.org/react-native-ble-plx/-/react-native-ble-plx-2.0.1.tgz"
-  "version" "2.0.1"
+"react-native-ble-plx@2.0.3":
+  "integrity" "sha512-62LRDBPf/03K7sge+qq2ZuF8PWCGB782G+SBrpgNm5fA5Hs3FCY1ExTJZ1G0tB5ZhBPYEXcKRxPLuFegcDFrqA=="
+  "resolved" "https://registry.npmjs.org/react-native-ble-plx/-/react-native-ble-plx-2.0.3.tgz"
+  "version" "2.0.3"
 
 "react-native-cli@^2.0.1":
   "integrity" "sha1-8s08eqG4OCjN+6Yw4t/YF992bVQ="
@@ -6610,12 +6610,12 @@
     "escape-string-regexp" "2.0.0"
     "invariant" "2.2.4"
 
-"react-native-wifi-reborn@4.3.3":
-  "integrity" "sha512-UZEd0Ekr93shbGRfvDoEViFIc92fOX4u8F4l5uZZgRWYm9W52ZWPKf2ape8eDw8GDl6rnfwl2BUIjZF2CW92CQ=="
-  "resolved" "https://registry.npmjs.org/react-native-wifi-reborn/-/react-native-wifi-reborn-4.3.3.tgz"
-  "version" "4.3.3"
+"react-native-wifi-reborn@4.5.0":
+  "integrity" "sha512-qfq4bxFfq7Zj2wwLbj+s1Iz9X68CkyuYz/cYmibD3Hq2evXsJHIiP3kEL4M0zHvX76/31snm9Wvclghzdy4wFw=="
+  "resolved" "https://registry.npmjs.org/react-native-wifi-reborn/-/react-native-wifi-reborn-4.5.0.tgz"
+  "version" "4.5.0"
 
-"react-native@<0.63.2", "react-native@0.63.2":
+"react-native@<0.63.2", "react-native@>=0.13", "react-native@>=0.59", "react-native@0.63.2":
   "integrity" "sha512-MkxHeJorUDzmQwKJrTfrFYMDRLyu9GSBpsFFMDX7X+HglVnaZi3CTzW2mRv1eIcazoseBOP2eJe+bnkyLl8Y2A=="
   "resolved" "https://registry.npmjs.org/react-native/-/react-native-0.63.2.tgz"
   "version" "0.63.2"
